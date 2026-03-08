@@ -1,0 +1,29 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://Autoloads/audio_manager.gd" id="1_script"]
+[ext_resource type="AudioStream" path="res://assets/audio/shoot.wav" id="2_shoot"]
+[ext_resource type="AudioStream" path="res://assets/audio/hit.wav" id="3_hit"]
+[ext_resource type="AudioStream" path="res://assets/audio/level_up.wav" id="4_lvlup"]
+[ext_resource type="AudioStream" path="res://assets/audio/game_over.wav" id="5_gameover"]
+
+[node name="AudioManager" type="Node"]
+process_mode = 3
+script = ExtResource("1_script")
+
+[node name="ShootPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_shoot")
+volume_db = -8.0
+max_polyphony = 8
+
+[node name="HitPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_hit")
+volume_db = -4.0
+max_polyphony = 5
+
+[node name="LevelUpPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4_lvlup")
+volume_db = 0.0
+
+[node name="GameOverPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5_gameover")
+volume_db = 0.0
