@@ -35,5 +35,5 @@ func _update_state() -> void:
 		status_label.add_theme_color_override("font_color", Color(0.7, 0.3, 0.3))
 
 func _on_pressed() -> void:
-	if ProgressManager.is_node_unlocked(node_data):
-		node_selected.emit(node_data)
+	# Always emit so the info panel can show lock reason
+	node_selected.emit(node_data)

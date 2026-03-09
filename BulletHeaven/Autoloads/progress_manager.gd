@@ -22,7 +22,18 @@ func is_node_unlocked(node_data: Resource) -> bool:
 	for req in node_data.unlock_requires:
 		if req not in completed_nodes:
 			return false
+	# Check rune requirement
+	var rune_req: String = node_data.get("rune_required")
+	if rune_req != null and rune_req != "":
+		if not has_item(rune_req):
+			return false
 	return true
+
+func use_rune_for_node(node_data: Resource) -> bool:
+	var rune_req: String = node_data.get("rune_required")
+	if rune_req == null or rune_req == "":
+		return true
+	return remove_item(rune_req)
 
 func is_node_completed(node_id: String) -> bool:
 	return node_id in completed_nodes

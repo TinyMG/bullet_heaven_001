@@ -9,10 +9,13 @@ extends Node2D
 @onready var info_desc: Label = $CanvasLayer/InfoPanel/VBoxContainer/DescLabel
 @onready var info_waves: Label = $CanvasLayer/InfoPanel/VBoxContainer/WavesLabel
 @onready var info_difficulty: Label = $CanvasLayer/InfoPanel/VBoxContainer/DifficultyLabel
+@onready var rune_label: Label = $CanvasLayer/InfoPanel/VBoxContainer/RuneLabel
 @onready var start_button: Button = $CanvasLayer/InfoPanel/VBoxContainer/StartButton
 @onready var back_button: Button = $CanvasLayer/BackButton
 @onready var inventory_button: Button = $CanvasLayer/InventoryButton
+@onready var crafting_button: Button = $CanvasLayer/CraftingButton
 @onready var inventory_panel = $InventoryPanel
+@onready var crafting_panel = $CraftingPanel
 
 var map_config: Resource = preload("res://Data/Nodes/world_map.tres")
 var node_button_scene: PackedScene = preload("res://UI/MapNodeButton.tscn")
@@ -24,6 +27,7 @@ func _ready() -> void:
 	start_button.pressed.connect(_on_start_pressed)
 	back_button.pressed.connect(_on_back_pressed)
 	inventory_button.pressed.connect(_on_inventory_pressed)
+	crafting_button.pressed.connect(_on_crafting_pressed)
 	_build_map()
 
 func _build_map() -> void:
@@ -54,14 +58,37 @@ func _on_node_selected(data: Resource) -> void:
 	if data.boss_on_final_wave:
 		info_waves.text += " (Boss)"
 
+	# Show rune requirement
+	var rune_req: String = data.get("rune_required")
+	if rune_req != null and rune_req != "":
+		var rune_data = ItemDatabase.get_item(rune_req)
+		var rune_name = rune_data.get("display_name", rune_req)
+		if ProgressManager.has_item(rune_req):
+			rune_label.text = "Requires: %s (owned)" % rune_name
+			rune_label.add_theme_color_override("font_color", Color(0.3, 1.0, 0.5))
+		else:
+			rune_label.text = "Requires: %s (missing)" % rune_name
+			rune_label.add_theme_color_override("font_color", Color(1.0, 0.4, 0.4))
+		rune_label.visible = true
+	else:
+		rune_label.visible = false
+
 	if ProgressManager.is_node_completed(data.node_id):
 		start_button.text = "Replay"
-	else:
+		start_button.disabled = false
+	elif ProgressManager.is_node_unlocked(data):
 		start_button.text = "Start"
+		start_button.disabled = false
+	else:
+		start_button.text = "Locked"
+		start_button.disabled = true
 	info_panel.visible = true
 
 func _on_start_pressed() -> void:
-	if selected_node:
+	if selected_node and ProgressManager.is_node_unlocked(selected_node):
+		# Consume rune if required
+		ProgressManager.use_rune_for_node(selected_node)
+		ProgressManager.save_game()
 		ProgressManager.select_node(selected_node)
 
 func _on_back_pressed() -> void:
@@ -69,6 +96,9 @@ func _on_back_pressed() -> void:
 
 func _on_inventory_pressed() -> void:
 	inventory_panel.show_inventory()
+
+func _on_crafting_pressed() -> void:
+	crafting_panel.show_crafting()
 
 func _draw() -> void:
 	for conn in map_config.connections:

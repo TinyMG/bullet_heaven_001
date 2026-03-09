@@ -12,6 +12,7 @@ extends Resource
 @export var boss_on_final_wave: bool = true
 @export var difficulty_modifier: float = 1.0
 @export var unlock_requires: Array[String] = []
+@export var rune_required: String = ""  # item_id of rune needed to unlock this node
 @export var region: String = "default"
 
 # Loot table: array of { "item_id": String, "drop_chance": float (0.0-1.0) }
