@@ -1,0 +1,31 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://UI/map_node_button.gd" id="1_script"]
+
+[node name="MapNodeButton" type="Control"]
+custom_minimum_size = Vector2(120, 80)
+script = ExtResource("1_script")
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 0
+offset_right = 120.0
+offset_bottom = 50.0
+theme_override_font_sizes/font_size = 14
+text = "Node"
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_top = 52.0
+offset_right = 120.0
+offset_bottom = 72.0
+theme_override_font_sizes/font_size = 12
+text = "Node Name"
+horizontal_alignment = 1
+
+[node name="StatusLabel" type="Label" parent="."]
+layout_mode = 0
+offset_top = -18.0
+offset_right = 120.0
+offset_bottom = 0.0
+theme_override_font_sizes/font_size = 10
+horizontal_alignment = 1

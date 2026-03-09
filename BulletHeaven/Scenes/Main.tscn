@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://dh8t8w81k36p6" path="res://assets/sprites/bg_stars.png" id="7_stars"]
 [ext_resource type="PackedScene" path="res://UI/PauseMenu.tscn" id="8_pause"]
 [ext_resource type="PackedScene" path="res://UI/BossHPBar.tscn" id="9_bossbar"]
+[ext_resource type="PackedScene" path="res://UI/WaveCompletePanel.tscn" id="10_wavecomplete"]
 
 [node name="Main" type="Node2D" unique_id=1962864037]
 script = ExtResource("1_main")
@@ -47,3 +48,5 @@ autostart = true
 [node name="PauseMenu" parent="." instance=ExtResource("8_pause")]
 
 [node name="BossHPBar" parent="." instance=ExtResource("9_bossbar")]
+
+[node name="WaveCompletePanel" parent="." instance=ExtResource("10_wavecomplete")]

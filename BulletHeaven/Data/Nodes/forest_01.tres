@@ -1,0 +1,18 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Data/map_node_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+node_id = "forest_01"
+display_name = "Dark Thicket"
+description = "A shadowy grove crawling with creatures."
+position_on_map = Vector2(200, 300)
+wave_count = 3
+base_enemies_per_wave = 3
+enemy_hp_base = 20.0
+enemy_hp_per_wave = 2.0
+boss_on_final_wave = false
+difficulty_modifier = 1.0
+unlock_requires = Array[String]([])
+region = "forest"

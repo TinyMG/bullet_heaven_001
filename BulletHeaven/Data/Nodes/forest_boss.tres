@@ -1,0 +1,18 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Data/map_node_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+node_id = "forest_boss"
+display_name = "Ancient Hollow"
+description = "The heart of the forest. A powerful guardian awaits."
+position_on_map = Vector2(600, 300)
+wave_count = 5
+base_enemies_per_wave = 5
+enemy_hp_base = 30.0
+enemy_hp_per_wave = 4.0
+boss_on_final_wave = true
+difficulty_modifier = 1.5
+unlock_requires = Array[String](["forest_02"])
+region = "forest"

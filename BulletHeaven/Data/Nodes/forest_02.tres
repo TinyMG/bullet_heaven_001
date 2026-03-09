@@ -1,0 +1,18 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Data/map_node_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+node_id = "forest_02"
+display_name = "Hollow Glen"
+description = "Deeper into the forest. Tougher foes lurk here."
+position_on_map = Vector2(400, 250)
+wave_count = 4
+base_enemies_per_wave = 4
+enemy_hp_base = 25.0
+enemy_hp_per_wave = 3.0
+boss_on_final_wave = false
+difficulty_modifier = 1.2
+unlock_requires = Array[String](["forest_01"])
+region = "forest"

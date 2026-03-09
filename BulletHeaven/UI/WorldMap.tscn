@@ -1,0 +1,87 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://UI/world_map.gd" id="1_script"]
+
+[node name="WorldMap" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.06, 0.06, 0.12, 1)
+
+[node name="TitleLabel" type="Label" parent="."]
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 400.0
+offset_bottom = 50.0
+theme_override_colors/font_color = Color(0.3, 0.7, 1.0, 1)
+theme_override_font_sizes/font_size = 28
+text = "World Map — Forest Region"
+
+[node name="ConnectionLines" type="Node2D" parent="."]
+
+[node name="NodeContainer" type="Node2D" parent="."]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="InfoPanel" type="PanelContainer" parent="CanvasLayer"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -320.0
+offset_top = -300.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/InfoPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.5, 1)
+theme_override_font_sizes/font_size = 24
+text = "Node Name"
+
+[node name="DescLabel" type="Label" parent="CanvasLayer/InfoPanel/VBoxContainer"]
+layout_mode = 2
+autowrap_mode = 2
+text = "Description goes here."
+
+[node name="WavesLabel" type="Label" parent="CanvasLayer/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Waves: 5"
+
+[node name="DifficultyLabel" type="Label" parent="CanvasLayer/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Difficulty: Normal"
+
+[node name="Control" type="Control" parent="CanvasLayer/InfoPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[node name="StartButton" type="Button" parent="CanvasLayer/InfoPanel/VBoxContainer"]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 22
+text = "Start"
+
+[node name="BackButton" type="Button" parent="CanvasLayer"]
+anchors_preset = 0
+offset_left = 20.0
+offset_top = 640.0
+offset_right = 170.0
+offset_bottom = 690.0
+theme_override_font_sizes/font_size = 18
+text = "Back to Menu"

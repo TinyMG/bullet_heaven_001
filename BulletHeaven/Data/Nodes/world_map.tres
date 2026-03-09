@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://Data/world_map_config.gd" id="1_script"]
+[ext_resource type="Resource" path="res://Data/Nodes/forest_01.tres" id="2_node1"]
+[ext_resource type="Resource" path="res://Data/Nodes/forest_02.tres" id="3_node2"]
+[ext_resource type="Resource" path="res://Data/Nodes/forest_boss.tres" id="4_node3"]
+
+[resource]
+script = ExtResource("1_script")
+nodes = Array[Resource]([ExtResource("2_node1"), ExtResource("3_node2"), ExtResource("4_node3")])
+connections = Array[Vector2i]([Vector2i(0, 1), Vector2i(1, 2)])
