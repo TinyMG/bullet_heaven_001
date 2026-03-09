@@ -13,3 +13,9 @@ extends Resource
 @export var difficulty_modifier: float = 1.0
 @export var unlock_requires: Array[String] = []
 @export var region: String = "default"
+
+# Loot table: array of { "item_id": String, "drop_chance": float (0.0-1.0) }
+# Regular enemies roll from this table on death
+@export var enemy_loot_table: Array[Dictionary] = []
+# Boss drops (guaranteed)
+@export var boss_loot_table: Array[Dictionary] = []

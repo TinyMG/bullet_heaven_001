@@ -25,6 +25,7 @@ GameManager="*res://Autoloads/game_manager.gd"
 SkillsManager="*res://Autoloads/skills_manager.gd"
 AudioManager="*res://Autoloads/AudioManager.tscn"
 ProgressManager="*res://Autoloads/progress_manager.gd"
+ItemDatabase="*res://Data/item_database.gd"
 
 [display]
 

@@ -11,6 +11,8 @@ extends Node2D
 @onready var info_difficulty: Label = $CanvasLayer/InfoPanel/VBoxContainer/DifficultyLabel
 @onready var start_button: Button = $CanvasLayer/InfoPanel/VBoxContainer/StartButton
 @onready var back_button: Button = $CanvasLayer/BackButton
+@onready var inventory_button: Button = $CanvasLayer/InventoryButton
+@onready var inventory_panel = $InventoryPanel
 
 var map_config: Resource = preload("res://Data/Nodes/world_map.tres")
 var node_button_scene: PackedScene = preload("res://UI/MapNodeButton.tscn")
@@ -21,6 +23,7 @@ func _ready() -> void:
 	info_panel.visible = false
 	start_button.pressed.connect(_on_start_pressed)
 	back_button.pressed.connect(_on_back_pressed)
+	inventory_button.pressed.connect(_on_inventory_pressed)
 	_build_map()
 
 func _build_map() -> void:
@@ -63,6 +66,9 @@ func _on_start_pressed() -> void:
 
 func _on_back_pressed() -> void:
 	get_tree().change_scene_to_file("res://UI/MainMenu.tscn")
+
+func _on_inventory_pressed() -> void:
+	inventory_panel.show_inventory()
 
 func _draw() -> void:
 	for conn in map_config.connections:

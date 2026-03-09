@@ -13,6 +13,7 @@ var current_hp: float
 var xp_gem_scene: PackedScene = preload("res://Entities/XPGem/XPGem.tscn")
 var damage_number_scene: PackedScene = preload("res://Entities/DamageNumber/DamageNumber.tscn")
 var death_effect_scene: PackedScene = preload("res://Entities/Effects/EnemyDeathEffect.tscn")
+var loot_drop_scene: PackedScene = preload("res://Entities/LootDrop/LootDrop.tscn")
 
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var hitbox: Area2D = $Hitbox
@@ -101,9 +102,31 @@ func _die() -> void:
 	gem.global_position = global_position
 	get_tree().current_scene.add_child.call_deferred(gem)
 
+	# Roll loot drops from current node's loot table
+	_roll_loot()
+
 	GameManager.add_score(50 if is_boss else 10)
 	GameManager.add_kill()
 	queue_free()
+
+func _roll_loot() -> void:
+	var node_data = ProgressManager.current_node
+	if node_data == null:
+		return
+
+	var loot_table: Array = []
+	if is_boss:
+		loot_table = node_data.boss_loot_table
+	else:
+		loot_table = node_data.enemy_loot_table
+
+	for entry in loot_table:
+		var chance: float = entry.get("drop_chance", 0.0)
+		if randf() <= chance:
+			var drop = loot_drop_scene.instantiate()
+			var offset = Vector2(randf_range(-15, 15), randf_range(-15, 15))
+			drop.setup(entry["item_id"], global_position + offset)
+			get_tree().current_scene.add_child.call_deferred(drop)
 
 func _boss_screen_flash() -> void:
 	var flash = ColorRect.new()
