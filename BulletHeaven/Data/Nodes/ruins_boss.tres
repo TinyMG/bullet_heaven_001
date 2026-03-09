@@ -1,0 +1,21 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Data/map_node_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+node_id = "ruins_boss"
+display_name = "Magma Core"
+description = "The heart of the ruins. The Magma Golem awaits."
+position_on_map = Vector2(600, 700)
+wave_count = 7
+base_enemies_per_wave = 7
+enemy_hp_base = 50.0
+enemy_hp_per_wave = 6.0
+boss_on_final_wave = true
+difficulty_modifier = 1.8
+unlock_requires = Array[String](["ruins_02"])
+rune_required = "ruins_rune"
+region = "ruins"
+enemy_loot_table = Array[Dictionary]([{"item_id": "ember_core", "drop_chance": 0.3}, {"item_id": "molten_shard", "drop_chance": 0.25}])
+boss_loot_table = Array[Dictionary]([{"item_id": "magma_crystal", "drop_chance": 1.0}, {"item_id": "molten_shard", "drop_chance": 1.0}])

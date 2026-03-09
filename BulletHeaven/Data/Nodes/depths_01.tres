@@ -1,0 +1,21 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Data/map_node_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+node_id = "depths_01"
+display_name = "Whispering Dark"
+description = "Shadows move on their own here. Stay alert."
+position_on_map = Vector2(200, 900)
+wave_count = 6
+base_enemies_per_wave = 6
+enemy_hp_base = 55.0
+enemy_hp_per_wave = 5.0
+boss_on_final_wave = true
+difficulty_modifier = 1.7
+unlock_requires = Array[String](["ruins_boss"])
+rune_required = "rune_of_embers"
+region = "depths"
+enemy_loot_table = Array[Dictionary]([{"item_id": "void_essence", "drop_chance": 0.4}, {"item_id": "shadow_silk", "drop_chance": 0.2}])
+boss_loot_table = Array[Dictionary]([{"item_id": "void_essence", "drop_chance": 1.0}, {"item_id": "shadow_silk", "drop_chance": 0.8}])

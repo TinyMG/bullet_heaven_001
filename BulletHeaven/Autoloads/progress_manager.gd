@@ -7,6 +7,7 @@ const SAVE_PATH: String = "user://save_data.json"
 
 signal inventory_changed(item_id: String, new_count: int)
 signal region_unlocked(region_id: String)
+signal equipment_changed
 
 var completed_nodes: Array = []
 var current_node: Resource = null
@@ -14,6 +15,10 @@ var unlocked_regions: Array = ["forest"]  # Forest unlocked by default
 
 # Inventory: item_id -> count
 var inventory: Dictionary = {}
+
+# Equipment: slot -> item_id (or "" if empty)
+var equipped_weapon: String = ""
+var equipped_armor: String = ""
 
 # Maps boss node_id -> region_id that it unlocks
 var boss_unlock_map: Dictionary = {
@@ -70,6 +75,62 @@ func unlock_region(region_id: String) -> void:
 func is_region_unlocked(region_id: String) -> bool:
 	return region_id in unlocked_regions
 
+# --- Equipment ---
+
+func equip_item(item_id: String) -> bool:
+	var item_data = ItemDatabase.get_item(item_id)
+	if item_data.is_empty():
+		return false
+	var item_type = item_data.get("type", "")
+	if item_type == "weapon":
+		# Unequip current weapon first
+		if equipped_weapon != "":
+			add_item(equipped_weapon)
+		equipped_weapon = item_id
+		remove_item(item_id)
+		equipment_changed.emit()
+		save_game()
+		return true
+	elif item_type == "armor":
+		if equipped_armor != "":
+			add_item(equipped_armor)
+		equipped_armor = item_id
+		remove_item(item_id)
+		equipment_changed.emit()
+		save_game()
+		return true
+	return false
+
+func unequip_item(slot: String) -> void:
+	if slot == "weapon" and equipped_weapon != "":
+		add_item(equipped_weapon)
+		equipped_weapon = ""
+		equipment_changed.emit()
+		save_game()
+	elif slot == "armor" and equipped_armor != "":
+		add_item(equipped_armor)
+		equipped_armor = ""
+		equipment_changed.emit()
+		save_game()
+
+func get_equipment_stat(stat_name: String) -> float:
+	var total: float = 0.0
+	if equipped_weapon != "":
+		var data = ItemDatabase.get_item(equipped_weapon)
+		var stats = data.get("stats", {})
+		total += stats.get(stat_name, 0.0)
+	if equipped_armor != "":
+		var data = ItemDatabase.get_item(equipped_armor)
+		var stats = data.get("stats", {})
+		total += stats.get(stat_name, 0.0)
+	return total
+
+func get_equipped_item_name(slot: String) -> String:
+	var item_id = equipped_weapon if slot == "weapon" else equipped_armor
+	if item_id == "":
+		return "None"
+	return ItemDatabase.get_display_name(item_id)
+
 # --- Inventory ---
 
 func add_item(item_id: String, amount: int = 1) -> void:
@@ -103,6 +164,8 @@ func save_game() -> void:
 		"completed_nodes": completed_nodes,
 		"inventory": inventory,
 		"unlocked_regions": unlocked_regions,
+		"equipped_weapon": equipped_weapon,
+		"equipped_armor": equipped_armor,
 	}
 	var file = FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file == null:
@@ -136,6 +199,8 @@ func load_game() -> void:
 		unlocked_regions = Array(data["unlocked_regions"])
 	else:
 		unlocked_regions = ["forest"]
+	equipped_weapon = data.get("equipped_weapon", "")
+	equipped_armor = data.get("equipped_armor", "")
 
 func delete_save() -> void:
 	if FileAccess.file_exists(SAVE_PATH):
@@ -145,5 +210,7 @@ func reset() -> void:
 	completed_nodes.clear()
 	inventory.clear()
 	unlocked_regions = ["forest"]
+	equipped_weapon = ""
+	equipped_armor = ""
 	current_node = null
 	delete_save()

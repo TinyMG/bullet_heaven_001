@@ -16,11 +16,16 @@ extends Node2D
 @onready var crafting_button: Button = $CanvasLayer/CraftingButton
 @onready var inventory_panel = $InventoryPanel
 @onready var crafting_panel = $CraftingPanel
+@onready var equipment_panel = $EquipmentPanel
+@onready var equip_button: Button = $CanvasLayer/EquipButton
 
 var map_config: Resource = preload("res://Data/Nodes/world_map.tres")
 var node_button_scene: PackedScene = preload("res://UI/MapNodeButton.tscn")
 var selected_node: Resource = null
 var node_positions: Array = []
+var scroll_offset: float = 0.0
+var scroll_speed: float = 400.0
+var max_scroll: float = 0.0
 
 var region_names: Dictionary = {
 	"forest": "Ashwood Forest",
@@ -36,8 +41,32 @@ func _ready() -> void:
 	back_button.pressed.connect(_on_back_pressed)
 	inventory_button.pressed.connect(_on_inventory_pressed)
 	crafting_button.pressed.connect(_on_crafting_pressed)
+	equip_button.pressed.connect(_on_equip_pressed)
 	ProgressManager.region_unlocked.connect(_on_region_unlocked)
 	_build_map()
+	set_process_input(true)
+
+func _input(event: InputEvent) -> void:
+	# Mouse wheel scrolling
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
+			scroll_offset = min(scroll_offset + 60.0, max_scroll)
+			node_container.position.y = -scroll_offset
+			queue_redraw()
+		elif event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
+			scroll_offset = max(scroll_offset - 60.0, 0.0)
+			node_container.position.y = -scroll_offset
+			queue_redraw()
+	# Arrow key scrolling
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_DOWN:
+			scroll_offset = min(scroll_offset + 60.0, max_scroll)
+			node_container.position.y = -scroll_offset
+			queue_redraw()
+		elif event.keycode == KEY_UP:
+			scroll_offset = max(scroll_offset - 60.0, 0.0)
+			node_container.position.y = -scroll_offset
+			queue_redraw()
 
 func _build_map() -> void:
 	node_positions.clear()
@@ -59,6 +88,13 @@ func _build_map() -> void:
 			btn.modulate = Color(0.3, 0.3, 0.3, 0.5)
 			btn.set_locked_region(true)
 
+	# Calculate scroll range based on node positions
+	var max_y: float = 0.0
+	for data in map_config.nodes:
+		max_y = max(max_y, data.position_on_map.y)
+	var viewport_height = get_viewport().get_visible_rect().size.y
+	max_scroll = max(0.0, max_y + 100.0 - viewport_height)
+	node_container.position.y = -scroll_offset
 	queue_redraw()
 
 func _on_node_selected(data: Resource) -> void:
@@ -117,11 +153,15 @@ func _on_inventory_pressed() -> void:
 func _on_crafting_pressed() -> void:
 	crafting_panel.show_crafting()
 
+func _on_equip_pressed() -> void:
+	equipment_panel.show_equipment()
+
 func _draw() -> void:
+	var offset = Vector2(0, -scroll_offset)
 	for conn in map_config.connections:
 		if conn.x < node_positions.size() and conn.y < node_positions.size():
-			var from = node_positions[conn.x]
-			var to = node_positions[conn.y]
+			var from = node_positions[conn.x] + offset
+			var to = node_positions[conn.y] + offset
 			draw_line(from, to, Color(0.5, 0.5, 0.6, 0.6), 2.0)
 
 func _on_region_unlocked(region_id: String) -> void:

@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://UI/world_map.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://UI/InventoryPanel.tscn" id="2_inventory"]
 [ext_resource type="PackedScene" path="res://UI/CraftingPanel.tscn" id="3_crafting"]
+[ext_resource type="PackedScene" path="res://UI/EquipmentPanel.tscn" id="4_equipment"]
 
 [node name="WorldMap" type="Node2D"]
 script = ExtResource("1_script")
@@ -111,6 +112,17 @@ offset_bottom = 690.0
 theme_override_font_sizes/font_size = 18
 text = "Crafting"
 
+[node name="EquipButton" type="Button" parent="CanvasLayer"]
+anchors_preset = 0
+offset_left = 530.0
+offset_top = 640.0
+offset_right = 680.0
+offset_bottom = 690.0
+theme_override_font_sizes/font_size = 18
+text = "Equipment"
+
 [node name="InventoryPanel" parent="." instance=ExtResource("2_inventory")]
 
 [node name="CraftingPanel" parent="." instance=ExtResource("3_crafting")]
+
+[node name="EquipmentPanel" parent="." instance=ExtResource("4_equipment")]

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Data/map_node_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+node_id = "ruins_02"
+display_name = "Molten Halls"
+description = "Corridors filled with flowing magma. The heat is unbearable."
+position_on_map = Vector2(400, 650)
+wave_count = 6
+base_enemies_per_wave = 6
+enemy_hp_base = 45.0
+enemy_hp_per_wave = 5.0
+boss_on_final_wave = true
+difficulty_modifier = 1.6
+unlock_requires = Array[String](["ruins_01"])
+region = "ruins"
+enemy_loot_table = Array[Dictionary]([{"item_id": "ember_core", "drop_chance": 0.35}, {"item_id": "molten_shard", "drop_chance": 0.3}])
+boss_loot_table = Array[Dictionary]([{"item_id": "molten_shard", "drop_chance": 1.0}, {"item_id": "ember_core", "drop_chance": 0.6}])

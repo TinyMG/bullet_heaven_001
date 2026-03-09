@@ -1,14 +1,23 @@
-[gd_resource type="Resource" load_steps=8 format=3]
+[gd_resource type="Resource" load_steps=17 format=3]
 
 [ext_resource type="Script" path="res://Data/world_map_config.gd" id="1_script"]
-[ext_resource type="Resource" path="res://Data/Nodes/forest_01.tres" id="2_node1"]
-[ext_resource type="Resource" path="res://Data/Nodes/forest_02.tres" id="3_node2"]
-[ext_resource type="Resource" path="res://Data/Nodes/forest_boss.tres" id="4_node3"]
-[ext_resource type="Resource" path="res://Data/Nodes/tundra_01.tres" id="5_node4"]
-[ext_resource type="Resource" path="res://Data/Nodes/tundra_02.tres" id="6_node5"]
-[ext_resource type="Resource" path="res://Data/Nodes/tundra_boss.tres" id="7_node6"]
+[ext_resource type="Resource" path="res://Data/Nodes/forest_01.tres" id="2_f01"]
+[ext_resource type="Resource" path="res://Data/Nodes/forest_02.tres" id="3_f02"]
+[ext_resource type="Resource" path="res://Data/Nodes/forest_boss.tres" id="4_fb"]
+[ext_resource type="Resource" path="res://Data/Nodes/tundra_01.tres" id="5_t01"]
+[ext_resource type="Resource" path="res://Data/Nodes/tundra_02.tres" id="6_t02"]
+[ext_resource type="Resource" path="res://Data/Nodes/tundra_boss.tres" id="7_tb"]
+[ext_resource type="Resource" path="res://Data/Nodes/ruins_01.tres" id="8_r01"]
+[ext_resource type="Resource" path="res://Data/Nodes/ruins_02.tres" id="9_r02"]
+[ext_resource type="Resource" path="res://Data/Nodes/ruins_boss.tres" id="10_rb"]
+[ext_resource type="Resource" path="res://Data/Nodes/depths_01.tres" id="11_d01"]
+[ext_resource type="Resource" path="res://Data/Nodes/depths_02.tres" id="12_d02"]
+[ext_resource type="Resource" path="res://Data/Nodes/depths_boss.tres" id="13_db"]
+[ext_resource type="Resource" path="res://Data/Nodes/nexus_01.tres" id="14_n01"]
+[ext_resource type="Resource" path="res://Data/Nodes/nexus_02.tres" id="15_n02"]
+[ext_resource type="Resource" path="res://Data/Nodes/nexus_boss.tres" id="16_nb"]
 
 [resource]
 script = ExtResource("1_script")
-nodes = Array[Resource]([ExtResource("2_node1"), ExtResource("3_node2"), ExtResource("4_node3"), ExtResource("5_node4"), ExtResource("6_node5"), ExtResource("7_node6")])
-connections = Array[Vector2i]([Vector2i(0, 1), Vector2i(1, 2), Vector2i(2, 3), Vector2i(3, 4), Vector2i(4, 5)])
+nodes = Array[Resource]([ExtResource("2_f01"), ExtResource("3_f02"), ExtResource("4_fb"), ExtResource("5_t01"), ExtResource("6_t02"), ExtResource("7_tb"), ExtResource("8_r01"), ExtResource("9_r02"), ExtResource("10_rb"), ExtResource("11_d01"), ExtResource("12_d02"), ExtResource("13_db"), ExtResource("14_n01"), ExtResource("15_n02"), ExtResource("16_nb")])
+connections = Array[Vector2i]([Vector2i(0, 1), Vector2i(1, 2), Vector2i(2, 3), Vector2i(3, 4), Vector2i(4, 5), Vector2i(5, 6), Vector2i(6, 7), Vector2i(7, 8), Vector2i(8, 9), Vector2i(9, 10), Vector2i(10, 11), Vector2i(11, 12), Vector2i(12, 13), Vector2i(13, 14)])

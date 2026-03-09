@@ -1,0 +1,109 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://UI/equipment_panel.gd" id="1_script"]
+
+[node name="EquipmentPanel" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.7)
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(360, 0)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -180.0
+offset_top = -220.0
+offset_right = 180.0
+offset_bottom = 220.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TitleLabel" type="Label" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1.0, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 22
+text = "Equipment"
+horizontal_alignment = 1
+
+[node name="HSeparator1" type="HSeparator" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="WeaponSection" type="VBoxContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="WeaponLabel" type="Label" parent="PanelContainer/VBoxContainer/WeaponSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1.0, 0.6, 0.3, 1)
+theme_override_font_sizes/font_size = 16
+text = "Weapon: None"
+
+[node name="WeaponStats" type="Label" parent="PanelContainer/VBoxContainer/WeaponSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+
+[node name="WeaponUnequip" type="Button" parent="PanelContainer/VBoxContainer/WeaponSection"]
+custom_minimum_size = Vector2(100, 30)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 12
+text = "Unequip"
+
+[node name="HSeparator2" type="HSeparator" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ArmorSection" type="VBoxContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="ArmorLabel" type="Label" parent="PanelContainer/VBoxContainer/ArmorSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.7, 1.0, 1)
+theme_override_font_sizes/font_size = 16
+text = "Armor: None"
+
+[node name="ArmorStats" type="Label" parent="PanelContainer/VBoxContainer/ArmorSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+
+[node name="ArmorUnequip" type="Button" parent="PanelContainer/VBoxContainer/ArmorSection"]
+custom_minimum_size = Vector2(100, 30)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 12
+text = "Unequip"
+
+[node name="HSeparator3" type="HSeparator" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="AvailableLabel" type="Label" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Available Gear:"
+
+[node name="GearList" type="VBoxContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="CloseButton" type="Button" parent="PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 16
+text = "Close"

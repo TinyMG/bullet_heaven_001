@@ -52,9 +52,14 @@ func _ready() -> void:
 	# Connect hurtbox
 	hurtbox.area_entered.connect(_on_hurtbox_area_entered)
 
+	# Apply equipment stats at combat start
+	_update_fire_rate()
+	_update_max_hp()
+	current_hp = max_hp
+
 func _physics_process(delta: float) -> void:
 	var input_vector = Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	var speed = base_speed + SkillsManager.get_skill_value("move_speed")
+	var speed = base_speed + SkillsManager.get_skill_value("move_speed") + ProgressManager.get_equipment_stat("move_speed")
 	
 	var is_boosting = Input.is_key_pressed(KEY_SHIFT) or Input.is_physical_key_pressed(KEY_SHIFT)
 	if is_boosting:
@@ -98,8 +103,8 @@ func _physics_process(delta: float) -> void:
 		# set frame
 		sprite.frame = (row * 10) + anim_current
 	
-	# HP regen from skills
-	var regen = SkillsManager.get_skill_value("hp_regen")
+	# HP regen from skills + equipment
+	var regen = SkillsManager.get_skill_value("hp_regen") + ProgressManager.get_equipment_stat("hp_regen")
 	if regen > 0.0 and current_hp < max_hp:
 		current_hp = min(current_hp + regen * delta, max_hp)
 
@@ -135,7 +140,7 @@ func _find_nearest_enemy() -> Node2D:
 
 func _fire_at(target: Node2D) -> void:
 	var base_direction = (target.global_position - muzzle.global_position).normalized()
-	var extra_projectiles = int(SkillsManager.get_skill_value("projectile_count"))
+	var extra_projectiles = int(SkillsManager.get_skill_value("projectile_count") + ProgressManager.get_equipment_stat("projectile_count"))
 	var total = 1 + extra_projectiles
 	var spread_angle = deg_to_rad(10.0)  # 10 degrees between each extra projectile
 	
@@ -150,8 +155,8 @@ func _fire_at(target: Node2D) -> void:
 		var direction = base_direction.rotated(offset_angle)
 
 		proj.direction = direction
-		proj.damage = base_damage + SkillsManager.get_skill_value("damage")
-		proj.pierce_count = int(SkillsManager.get_skill_value("projectile_pierce"))
+		proj.damage = base_damage + SkillsManager.get_skill_value("damage") + ProgressManager.get_equipment_stat("damage")
+		proj.pierce_count = int(SkillsManager.get_skill_value("projectile_pierce") + ProgressManager.get_equipment_stat("projectile_pierce"))
 		if not proj.is_inside_tree():
 			get_tree().current_scene.add_child(proj)
 		else:
@@ -164,14 +169,20 @@ func _fire_at(target: Node2D) -> void:
 func _on_skill_upgraded(skill_name: String, _new_rank: int) -> void:
 	match skill_name:
 		"fire_rate":
-			var reduction = SkillsManager.get_skill_value("fire_rate")
-			fire_timer.wait_time = max(0.1, base_fire_rate - (base_fire_rate * reduction))
+			_update_fire_rate()
 		"pickup_radius":
 			_update_magnet_radius()
 		"max_hp":
-			var bonus = SkillsManager.get_skill_value("max_hp")
-			max_hp = 100.0 + bonus
+			_update_max_hp()
 			current_hp = min(current_hp + 10.0, max_hp)  # Heal a bit on upgrade
+
+func _update_fire_rate() -> void:
+	var reduction = SkillsManager.get_skill_value("fire_rate") + ProgressManager.get_equipment_stat("fire_rate")
+	fire_timer.wait_time = max(0.1, base_fire_rate - (base_fire_rate * reduction))
+
+func _update_max_hp() -> void:
+	var bonus = SkillsManager.get_skill_value("max_hp") + ProgressManager.get_equipment_stat("max_hp")
+	max_hp = 100.0 + bonus
 
 func _update_magnet_radius() -> void:
 	var radius = base_magnet_radius + SkillsManager.get_skill_value("pickup_radius")

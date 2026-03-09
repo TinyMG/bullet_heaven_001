@@ -2,11 +2,16 @@
   "mcpServers": {
     "godot": {
       "command": "node",
-      "args": ["C:\\Users\\rnaci\\Documents\\Bullet_Hell_Game_NoTitle\\godot-mcp\\build\\index.js"],
+      "args": [
+        "C:\\Users\\rnaci\\Documents\\Bullet_Hell_Game_NoTitle\\godot-mcp\\build\\index.js"
+      ],
       "env": {
         "GODOT_PROJECT_PATH": "C:\\Users\\rnaci\\Documents\\Bullet_Hell_Game_NoTitle",
         "GODOT_PATH": "C:\\Users\\rnaci\\Documents\\Godot_v4.6 IDE\\Godot_v4.6-stable_win64.exe"
       }
     }
+  },
+  "enabledPlugins": {
+    "godot@godot-claude-skills": true
   }
 }
