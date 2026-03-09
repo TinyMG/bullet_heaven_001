@@ -98,7 +98,7 @@ func _spawn_wave(count: int) -> void:
 		var offset = Vector2(cos(angle), sin(angle)) * spawn_radius
 		var spawn_pos = player.global_position + offset
 
-		var enemy = enemy_scene.instantiate()
+		var enemy = ObjectPool.get_instance(enemy_scene)
 		enemy.global_position = spawn_pos
 
 		# Scale enemy HP
@@ -106,7 +106,10 @@ func _spawn_wave(count: int) -> void:
 		# Apply difficulty modifier to speed
 		enemy.speed *= node_difficulty
 
-		get_tree().current_scene.add_child.call_deferred(enemy)
+		if not enemy.is_inside_tree():
+			get_tree().current_scene.add_child.call_deferred(enemy)
+		else:
+			enemy.activate()
 
 func _spawn_boss() -> void:
 	var player = GameManager.player
@@ -117,12 +120,15 @@ func _spawn_boss() -> void:
 	var offset = Vector2(cos(angle), sin(angle)) * spawn_radius
 	var spawn_pos = player.global_position + offset
 
-	var boss = boss_scene.instantiate()
+	var boss = ObjectPool.get_instance(boss_scene)
 	boss.global_position = spawn_pos
 	boss.speed *= node_difficulty
 	active_boss = boss
 
-	get_tree().current_scene.add_child.call_deferred(boss)
+	if not boss.is_inside_tree():
+		get_tree().current_scene.add_child.call_deferred(boss)
+	else:
+		boss.activate()
 
 	# Notify boss HP bar
 	var boss_bar = get_tree().current_scene.get_node_or_null("BossHPBar")

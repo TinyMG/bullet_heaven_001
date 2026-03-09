@@ -33,4 +33,5 @@ func _on_waves_completed() -> void:
 
 func _on_continue_pressed() -> void:
 	get_tree().paused = false
+	ObjectPool.clear_all()
 	get_tree().change_scene_to_file("res://UI/WorldMap.tscn")

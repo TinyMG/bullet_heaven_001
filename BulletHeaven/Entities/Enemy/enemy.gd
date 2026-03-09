@@ -1,7 +1,7 @@
 extends CharacterBody2D
 
 ## Enemy.gd
-## Chases the player. Has health. Drops XP gem on death.
+## Chases the player. Has health. Drops XP gem on death. Supports object pooling.
 
 @export var speed: float = 80.0
 @export var max_hp: float = 20.0
@@ -9,6 +9,8 @@ extends CharacterBody2D
 @export var is_boss: bool = false
 
 var current_hp: float
+var _default_speed: float = 80.0
+var _ready_done: bool = false
 
 var xp_gem_scene: PackedScene = preload("res://Entities/XPGem/XPGem.tscn")
 var damage_number_scene: PackedScene = preload("res://Entities/DamageNumber/DamageNumber.tscn")
@@ -26,9 +28,23 @@ var anim_frame_count: int = 6  # Frames per row
 var anim_current: int = 0
 
 func _ready() -> void:
+	if not _ready_done:
+		_default_speed = speed
+		add_to_group("Enemy")
+		hitbox.add_to_group("EnemyHitbox")
+		_ready_done = true
+	activate()
+
+func activate() -> void:
 	current_hp = max_hp
-	add_to_group("Enemy")
-	hitbox.add_to_group("EnemyHitbox")
+	visible = true
+	set_physics_process(true)
+	sprite.modulate = Color.WHITE
+	# Re-enable collision
+	set_deferred("collision_layer", 2)
+	set_deferred("collision_mask", 1)
+	hitbox.set_deferred("monitoring", true)
+	hitbox.set_deferred("monitorable", true)
 	# Randomize starting frame
 	anim_current = randi() % anim_frame_count
 	sprite.frame = anim_frame_start + anim_current
@@ -98,16 +114,31 @@ func _die() -> void:
 	effect.add_child(timer)
 
 	# Spawn XP gem
-	var gem = xp_gem_scene.instantiate()
+	var gem = ObjectPool.get_instance(xp_gem_scene)
 	gem.global_position = global_position
-	get_tree().current_scene.add_child.call_deferred(gem)
+	if not gem.is_inside_tree():
+		get_tree().current_scene.add_child.call_deferred(gem)
+	else:
+		gem.activate()
 
 	# Roll loot drops from current node's loot table
 	_roll_loot()
 
 	GameManager.add_score(50 if is_boss else 10)
 	GameManager.add_kill()
-	queue_free()
+	_release()
+
+func _release() -> void:
+	# Disable collision so we don't interact while pooled
+	set_deferred("collision_layer", 0)
+	set_deferred("collision_mask", 0)
+	hitbox.set_deferred("monitoring", false)
+	hitbox.set_deferred("monitorable", false)
+	set_physics_process(false)
+	visible = false
+	# Reset speed for next use
+	speed = _default_speed
+	ObjectPool.release_node.call_deferred(self)
 
 func _roll_loot() -> void:
 	var node_data = ProgressManager.current_node
@@ -123,10 +154,13 @@ func _roll_loot() -> void:
 	for entry in loot_table:
 		var chance: float = entry.get("drop_chance", 0.0)
 		if randf() <= chance:
-			var drop = loot_drop_scene.instantiate()
+			var drop = ObjectPool.get_instance(loot_drop_scene)
 			var offset = Vector2(randf_range(-15, 15), randf_range(-15, 15))
 			drop.setup(entry["item_id"], global_position + offset)
-			get_tree().current_scene.add_child.call_deferred(drop)
+			if not drop.is_inside_tree():
+				get_tree().current_scene.add_child.call_deferred(drop)
+			else:
+				drop.activate()
 
 func _boss_screen_flash() -> void:
 	var flash = ColorRect.new()

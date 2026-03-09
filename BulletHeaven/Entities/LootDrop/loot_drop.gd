@@ -2,13 +2,14 @@ extends Area2D
 
 ## LootDrop
 ## A collectible item that spawns at enemy death position.
-## Magnetizes toward player like XP gems.
+## Magnetizes toward player like XP gems. Supports object pooling.
 
 var item_id: String = ""
 var spawn_pos: Vector2 = Vector2.ZERO
 var magnet_speed: float = 250.0
 var is_magnetized: bool = false
 var target: Node2D = null
+var _ready_done: bool = false
 
 @onready var sprite: ColorRect = $ColorIndicator
 @onready var label: Label = $Label
@@ -18,11 +19,26 @@ func setup(id: String, pos: Vector2) -> void:
 	spawn_pos = pos
 
 func _ready() -> void:
-	add_to_group("LootDrop")
-	collision_layer = 8  # Pickup layer
-	collision_mask = 1   # Match XPGem setup exactly
-	area_entered.connect(_on_area_entered)
-	body_entered.connect(_on_body_entered)
+	if not _ready_done:
+		add_to_group("LootDrop")
+		collision_layer = 8  # Pickup layer
+		collision_mask = 1   # Match XPGem setup exactly
+		area_entered.connect(_on_area_entered)
+		body_entered.connect(_on_body_entered)
+		_ready_done = true
+	_apply_setup()
+
+func activate() -> void:
+	_apply_setup()
+
+func _apply_setup() -> void:
+	# Reset state
+	is_magnetized = false
+	target = null
+	visible = true
+	set_physics_process(true)
+	set_deferred("monitoring", true)
+	set_deferred("monitorable", true)
 
 	# Apply position from setup
 	global_position = spawn_pos
@@ -64,4 +80,11 @@ func _on_body_entered(body: Node2D) -> void:
 
 func _collect() -> void:
 	ProgressManager.add_item(item_id)
-	queue_free()
+	_release()
+
+func _release() -> void:
+	set_deferred("monitoring", false)
+	set_deferred("monitorable", false)
+	set_physics_process(false)
+	visible = false
+	ObjectPool.release_node.call_deferred(self)

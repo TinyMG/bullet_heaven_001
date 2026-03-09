@@ -125,19 +125,22 @@ func _fire_at(target: Node2D) -> void:
 	var spread_angle = deg_to_rad(10.0)  # 10 degrees between each extra projectile
 	
 	for i in range(total):
-		var proj = projectile_scene.instantiate()
+		var proj = ObjectPool.get_instance(projectile_scene)
 		proj.global_position = muzzle.global_position
-		
+
 		# Calculate spread offset
 		var offset_angle = 0.0
 		if total > 1:
 			offset_angle = (i - (total - 1) / 2.0) * spread_angle
 		var direction = base_direction.rotated(offset_angle)
-		
+
 		proj.direction = direction
 		proj.damage = base_damage + SkillsManager.get_skill_value("damage")
 		proj.pierce_count = int(SkillsManager.get_skill_value("projectile_pierce"))
-		get_tree().current_scene.add_child(proj)
+		if not proj.is_inside_tree():
+			get_tree().current_scene.add_child(proj)
+		else:
+			proj.activate()
 	
 	AudioManager.play_shoot()
 	
