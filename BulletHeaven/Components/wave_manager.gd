@@ -33,6 +33,10 @@ func _ready() -> void:
 		node_enemy_hp_per_wave = node_data.enemy_hp_per_wave
 		node_difficulty = node_data.difficulty_modifier
 		boss_on_final_wave = node_data.boss_on_final_wave
+		# Use custom enemy scene if configured
+		var custom_path: String = node_data.get("enemy_scene_path")
+		if custom_path != null and custom_path != "":
+			enemy_scene = load(custom_path)
 
 	# Apply node modifiers
 	_apply_modifiers()

@@ -8,6 +8,13 @@ extends CharacterBody2D
 @export var contact_damage: float = 10.0
 @export var is_boss: bool = false
 
+# Multi-sheet animation (optional — if set, overrides single sprite sheet)
+@export var idle_texture: Texture2D = null
+@export var move_texture: Texture2D = null
+@export var death_texture: Texture2D = null
+@export var sheet_hframes: int = 6
+@export var sheet_vframes: int = 6
+
 var current_hp: float
 var _default_speed: float = 80.0
 var _default_contact_damage: float = 10.0
@@ -32,6 +39,8 @@ var anim_delay: float = 0.2
 var anim_frame_start: int = 0  # First frame in the walk row
 var anim_frame_count: int = 6  # Frames per row
 var anim_current: int = 0
+var _uses_multi_sheet: bool = false
+var _current_anim: String = ""  # "idle", "move", "death"
 
 func _ready() -> void:
 	if not _ready_done:
@@ -57,6 +66,10 @@ func activate() -> void:
 	set_deferred("collision_mask", 1)
 	hitbox.set_deferred("monitoring", true)
 	hitbox.set_deferred("monitorable", true)
+	# Detect multi-sheet animation
+	_uses_multi_sheet = (idle_texture != null and move_texture != null)
+	if _uses_multi_sheet:
+		_set_anim("idle")
 	# Randomize starting frame
 	anim_current = randi() % anim_frame_count
 	sprite.frame = anim_frame_start + anim_current
@@ -78,6 +91,13 @@ func _physics_process(delta: float) -> void:
 	if velocity.x != 0:
 		sprite.flip_h = velocity.x < 0
 	
+	# Switch animation sheet based on movement
+	if _uses_multi_sheet:
+		if velocity.length() > 5.0:
+			_set_anim("move")
+		else:
+			_set_anim("idle")
+
 	# Walk animation cycle
 	anim_timer += delta
 	if anim_timer >= anim_delay:
@@ -153,7 +173,31 @@ func _die() -> void:
 	GameManager.add_kill()
 	if is_boss:
 		GameManager.boss_defeated.emit()
-	_release()
+
+	# Play death animation if multi-sheet, then release
+	if _uses_multi_sheet and death_texture:
+		_play_death_anim()
+	else:
+		_release()
+
+func _play_death_anim() -> void:
+	# Stop movement and collision, but stay visible for death anim
+	set_physics_process(false)
+	set_deferred("collision_layer", 0)
+	hitbox.set_deferred("monitoring", false)
+	hitbox.set_deferred("monitorable", false)
+	if is_in_group("Enemy"):
+		remove_from_group("Enemy")
+
+	_set_anim("death")
+	# Total frames in death sheet
+	var total_frames = sheet_hframes * sheet_vframes
+	var frame_time = anim_delay
+	var tween = create_tween()
+	for i in range(total_frames):
+		tween.tween_callback(func(): sprite.frame = i)
+		tween.tween_interval(frame_time)
+	tween.tween_callback(_release)
 
 func _release() -> void:
 	# Clean up overhead boss HP bar
@@ -178,7 +222,37 @@ func _release() -> void:
 	# Reset speed and damage for next use
 	speed = _default_speed
 	contact_damage = _default_contact_damage
+	_current_anim = ""
 	ObjectPool.release_node.call_deferred(self)
+
+func _set_anim(anim_name: String) -> void:
+	if _current_anim == anim_name:
+		return
+	_current_anim = anim_name
+	match anim_name:
+		"idle":
+			if idle_texture:
+				sprite.texture = idle_texture
+				sprite.hframes = sheet_hframes
+				sprite.vframes = sheet_vframes
+				anim_frame_count = sheet_hframes
+				anim_frame_start = 0
+		"move":
+			if move_texture:
+				sprite.texture = move_texture
+				sprite.hframes = sheet_hframes
+				sprite.vframes = sheet_vframes
+				anim_frame_count = sheet_hframes
+				anim_frame_start = 0
+		"death":
+			if death_texture:
+				sprite.texture = death_texture
+				sprite.hframes = sheet_hframes
+				sprite.vframes = sheet_vframes
+				anim_frame_count = sheet_hframes
+				anim_frame_start = 0
+	anim_current = 0
+	sprite.frame = anim_frame_start
 
 func _roll_loot() -> void:
 	var node_data = ProgressManager.current_node
