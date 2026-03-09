@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://UI/main_menu.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://UI/SettingsPanel.tscn" id="2_settings"]
 
 [node name="MainMenu" type="CanvasLayer"]
 script = ExtResource("1_script")
@@ -57,9 +58,18 @@ size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 32
 text = "Start Game"
 
+[node name="SettingsButton" type="Button" parent="Control/VBoxContainer"]
+custom_minimum_size = Vector2(250, 60)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 32
+text = "Settings"
+
 [node name="QuitButton" type="Button" parent="Control/VBoxContainer"]
 custom_minimum_size = Vector2(250, 60)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 32
 text = "Quit"
+
+[node name="SettingsPanel" parent="." instance=ExtResource("2_settings")]

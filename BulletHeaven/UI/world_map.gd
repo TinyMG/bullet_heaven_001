@@ -10,6 +10,7 @@ extends Node2D
 @onready var info_waves: Label = $CanvasLayer/InfoPanel/VBoxContainer/WavesLabel
 @onready var info_difficulty: Label = $CanvasLayer/InfoPanel/VBoxContainer/DifficultyLabel
 @onready var rune_label: Label = $CanvasLayer/InfoPanel/VBoxContainer/RuneLabel
+@onready var drops_label: Label = $CanvasLayer/InfoPanel/VBoxContainer/DropsLabel
 @onready var modifiers_container: VBoxContainer = $CanvasLayer/InfoPanel/VBoxContainer/ModifiersContainer
 @onready var modifiers_label: Label = $CanvasLayer/InfoPanel/VBoxContainer/ModifiersLabel
 @onready var bonus_label: Label = $CanvasLayer/InfoPanel/VBoxContainer/BonusLabel
@@ -129,6 +130,9 @@ func _on_node_selected(data: Resource) -> void:
 	else:
 		rune_label.visible = false
 
+	# Show expected drops
+	_populate_drop_hints(data)
+
 	if ProgressManager.is_node_completed(data.node_id):
 		start_button.text = "Replay"
 		start_button.disabled = false
@@ -166,6 +170,26 @@ func _on_crafting_pressed() -> void:
 
 func _on_equip_pressed() -> void:
 	equipment_panel.show_equipment()
+
+func _populate_drop_hints(data: Resource) -> void:
+	# Collect unique item names from both enemy and boss loot tables
+	var seen: Dictionary = {}
+	var drop_names: Array[String] = []
+	for entry in data.enemy_loot_table:
+		var item_id: String = entry.get("item_id", "")
+		if item_id != "" and not seen.has(item_id):
+			seen[item_id] = true
+			drop_names.append(ItemDatabase.get_display_name(item_id))
+	for entry in data.boss_loot_table:
+		var item_id: String = entry.get("item_id", "")
+		if item_id != "" and not seen.has(item_id):
+			seen[item_id] = true
+			drop_names.append(ItemDatabase.get_display_name(item_id))
+
+	if drop_names.is_empty():
+		drops_label.text = ""
+	else:
+		drops_label.text = "Drops: %s" % ", ".join(drop_names)
 
 func _populate_modifiers(enabled: bool) -> void:
 	for child in modifiers_container.get_children():

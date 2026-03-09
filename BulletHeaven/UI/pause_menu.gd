@@ -2,11 +2,14 @@ extends CanvasLayer
 
 @onready var panel: PanelContainer = $PanelContainer
 @onready var resume_button: Button = $PanelContainer/VBoxContainer/ResumeButton
+@onready var settings_button: Button = $PanelContainer/VBoxContainer/SettingsButton
 @onready var quit_button: Button = $PanelContainer/VBoxContainer/QuitButton
+@onready var settings_panel = $SettingsPanel
 
 func _ready() -> void:
 	visible = false
 	resume_button.pressed.connect(_on_resume_pressed)
+	settings_button.pressed.connect(_on_settings_pressed)
 	quit_button.pressed.connect(_on_quit_pressed)
 
 func _input(event: InputEvent) -> void:
@@ -21,6 +24,9 @@ func toggle_pause() -> void:
 
 func _on_resume_pressed() -> void:
 	toggle_pause()
+
+func _on_settings_pressed() -> void:
+	settings_panel.show_settings()
 
 func _on_quit_pressed() -> void:
 	get_tree().paused = false
