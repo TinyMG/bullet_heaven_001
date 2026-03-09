@@ -24,11 +24,28 @@ theme_override_constants/separation = 4
 layout_mode = 2
 text = "Score: 0"
 
+[node name="KillsLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Kills: 0"
+
 [node name="HPBar" type="ProgressBar" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
-custom_minimum_size = Vector2(200, 20)
+custom_minimum_size = Vector2(200, 24)
 max_value = 100.0
 value = 100.0
+show_percentage = false
+
+[node name="HPLabel" type="Label" parent="MarginContainer/VBoxContainer/HPBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "HP: 100 / 100"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 12
 
 [node name="XPBar" type="ProgressBar" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -39,3 +56,16 @@ value = 0.0
 [node name="LevelLabel" type="Label" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Level: 1"
+
+[node name="TimerLabel" type="Label" parent="."]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -120.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = 30.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 20
+text = "00:00"
+horizontal_alignment = 2

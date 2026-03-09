@@ -42,6 +42,27 @@ var skills: Dictionary = {
 		"current_rank": 0,
 		"effect_per_rank": 10.0  # +10 HP per rank
 	},
+	"projectile_count": {
+		"display_name": "Multishot",
+		"description": "Fires additional projectiles.",
+		"max_rank": 4,
+		"current_rank": 0,
+		"effect_per_rank": 1  # +1 extra projectile per rank
+	},
+	"hp_regen": {
+		"display_name": "HP Regen",
+		"description": "Regenerate HP over time.",
+		"max_rank": 5,
+		"current_rank": 0,
+		"effect_per_rank": 1.0  # +1 HP/sec per rank
+	},
+	"projectile_pierce": {
+		"display_name": "Pierce",
+		"description": "Projectiles pass through enemies.",
+		"max_rank": 3,
+		"current_rank": 0,
+		"effect_per_rank": 1  # +1 pierce per rank
+	},
 }
 
 func get_random_upgrades(count: int = 3) -> Array:

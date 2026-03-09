@@ -16,8 +16,17 @@ var current_xp: int = 0
 var current_level: int = 1
 var xp_to_next_level: int = 10  # Base XP required
 
+# Stats
+var elapsed_time: float = 0.0
+var total_kills: int = 0
+var total_damage_dealt: float = 0.0
+
 func _ready() -> void:
 	pass
+
+func _process(delta: float) -> void:
+	if not is_game_over:
+		elapsed_time += delta
 
 func add_score(amount: int) -> void:
 	score += amount
@@ -37,6 +46,12 @@ func _calculate_xp_for_level(level: int) -> int:
 	# XP curve: each level needs more XP
 	return int(10 * pow(level, 1.2))
 
+func add_kill() -> void:
+	total_kills += 1
+
+func add_damage_dealt(amount: float) -> void:
+	total_damage_dealt += amount
+
 func trigger_game_over() -> void:
 	if is_game_over:
 		return
@@ -49,3 +64,12 @@ func reset() -> void:
 	current_level = 1
 	xp_to_next_level = 10
 	is_game_over = false
+	elapsed_time = 0.0
+	total_kills = 0
+	total_damage_dealt = 0.0
+
+func get_time_string() -> String:
+	var minutes = int(elapsed_time) / int(60)
+	var seconds = int(elapsed_time) % int(60)
+	return "%02d:%02d" % [minutes, seconds]
+
