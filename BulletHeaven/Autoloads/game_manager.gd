@@ -7,6 +7,7 @@ signal score_changed(new_score: int)
 signal game_over
 signal player_leveled_up(new_level: int)
 signal waves_completed
+signal boss_defeated
 
 var score: int = 0
 var player: CharacterBody2D = null

@@ -29,7 +29,8 @@ func _on_waves_completed() -> void:
 	kills_label.text = "Enemies Killed: %d" % GameManager.total_kills
 	damage_label.text = "Damage Dealt: %d" % int(GameManager.total_damage_dealt)
 	visible = true
-	get_tree().paused = true
+	# Don't pause — let player collect remaining drops/gems first
+	# Player presses Continue when they're ready to leave
 
 func _on_continue_pressed() -> void:
 	get_tree().paused = false

@@ -18,7 +18,7 @@ var projectile_scene: PackedScene = preload("res://Entities/Projectile/Projectil
 
 var max_hp: float = 100.0
 var current_hp: float = 100.0
-var base_magnet_radius: float = 60.0
+var base_magnet_radius: float = 120.0
 
 var anim_timer: float = 0.0
 var anim_delay: float = 0.1
@@ -35,6 +35,8 @@ var current_anim_state: AnimState = AnimState.IDLE
 var is_invincible: bool = false
 var invincibility_duration: float = 1.0
 var blink_tween: Tween = null
+var contact_damage_cooldown: float = 0.0
+var contact_damage_interval: float = 0.5  # seconds between contact damage ticks
 
 func _ready() -> void:
 	GameManager.player = self
@@ -101,6 +103,19 @@ func _physics_process(delta: float) -> void:
 	if regen > 0.0 and current_hp < max_hp:
 		current_hp = min(current_hp + regen * delta, max_hp)
 
+	# Continuous contact damage from overlapping enemies
+	if contact_damage_cooldown > 0.0:
+		contact_damage_cooldown -= delta
+	elif not is_invincible:
+		var overlapping = hurtbox.get_overlapping_areas()
+		for area in overlapping:
+			if area.is_in_group("EnemyHitbox"):
+				var enemy = area.get_parent()
+				var dmg = enemy.contact_damage if enemy.has_method("take_damage") else 10.0
+				take_damage(dmg)
+				_push_enemy(enemy)
+				break  # Only take damage from one enemy per tick
+
 func _on_fire_timer_timeout() -> void:
 	var nearest = _find_nearest_enemy()
 	if nearest == null:
@@ -166,12 +181,13 @@ func take_damage(amount: float) -> void:
 	if is_invincible:
 		return
 	current_hp -= amount
-	
+	contact_damage_cooldown = contact_damage_interval
+
 	# Hit flash (red)
 	sprite.modulate = Color.RED
 	var flash_tween = create_tween()
 	flash_tween.tween_property(sprite, "modulate", Color.WHITE, 0.15)
-	
+
 	# Screen shake
 	var camera = get_viewport().get_camera_2d()
 	if camera:
@@ -179,7 +195,7 @@ func take_damage(amount: float) -> void:
 			if child.has_method("shake"):
 				child.shake(10.0, 0.3)
 				break
-	
+
 	if current_hp <= 0:
 		current_hp = 0
 		GameManager.trigger_game_over()
@@ -208,5 +224,14 @@ func _end_invincibility() -> void:
 		blink_tween.kill()
 
 func _on_hurtbox_area_entered(area: Area2D) -> void:
-	if area.is_in_group("EnemyHitbox"):
-		take_damage(10.0)
+	if area.is_in_group("EnemyHitbox") and not is_invincible:
+		var enemy = area.get_parent()
+		var dmg = enemy.contact_damage if enemy.has_method("take_damage") else 10.0
+		take_damage(dmg)
+		_push_enemy(enemy)
+
+func _push_enemy(enemy: Node2D) -> void:
+	if enemy is CharacterBody2D:
+		var push_dir = (enemy.global_position - global_position).normalized()
+		enemy.velocity = push_dir * 200.0
+		enemy.move_and_slide()

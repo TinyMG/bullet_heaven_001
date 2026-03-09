@@ -1,0 +1,20 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Data/map_node_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+node_id = "tundra_02"
+display_name = "Glacial Cavern"
+description = "Deep caves coated in ancient ice. Stronger creatures dwell within."
+position_on_map = Vector2(400, 450)
+wave_count = 5
+base_enemies_per_wave = 5
+enemy_hp_base = 35.0
+enemy_hp_per_wave = 4.0
+boss_on_final_wave = true
+difficulty_modifier = 1.4
+unlock_requires = Array[String](["tundra_01"])
+region = "tundra"
+enemy_loot_table = Array[Dictionary]([{"item_id": "frost_wisp", "drop_chance": 0.35}, {"item_id": "frozen_claw", "drop_chance": 0.3}])
+boss_loot_table = Array[Dictionary]([{"item_id": "frozen_claw", "drop_chance": 1.0}, {"item_id": "frost_wisp", "drop_chance": 0.6}])

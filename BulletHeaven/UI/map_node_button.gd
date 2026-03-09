@@ -6,6 +6,7 @@ extends Control
 signal node_selected(data: Resource)
 
 var node_data: Resource = null
+var _region_locked: bool = false
 
 @onready var button: Button = $Button
 @onready var label: Label = $Label
@@ -13,6 +14,9 @@ var node_data: Resource = null
 
 func setup(data: Resource) -> void:
 	node_data = data
+
+func set_locked_region(locked: bool) -> void:
+	_region_locked = locked
 
 func _ready() -> void:
 	if node_data == null:
@@ -35,5 +39,6 @@ func _update_state() -> void:
 		status_label.add_theme_color_override("font_color", Color(0.7, 0.3, 0.3))
 
 func _on_pressed() -> void:
-	# Always emit so the info panel can show lock reason
+	if _region_locked:
+		return  # Can't interact with nodes from locked regions
 	node_selected.emit(node_data)

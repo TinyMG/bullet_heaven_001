@@ -44,6 +44,28 @@ var items: Dictionary = {
 		"rarity": "epic",
 		"icon_color": Color(1.0, 0.4, 0.8),
 	},
+	# Tundra materials
+	"frost_wisp": {
+		"display_name": "Frost Wisp",
+		"description": "A shimmering ice fragment from a wraith.",
+		"type": "material",
+		"rarity": "common",
+		"icon_color": Color(0.6, 0.85, 1.0),
+	},
+	"frozen_claw": {
+		"display_name": "Frozen Claw",
+		"description": "A crystallized claw from a frost bear.",
+		"type": "material",
+		"rarity": "uncommon",
+		"icon_color": Color(0.4, 0.7, 0.9),
+	},
+	"yeti_heart": {
+		"display_name": "Yeti Heart",
+		"description": "A still-beating frozen heart from the Yeti boss.",
+		"type": "material",
+		"rarity": "epic",
+		"icon_color": Color(0.3, 0.5, 1.0),
+	},
 	# Runes (craftable key items)
 	"forest_rune": {
 		"display_name": "Forest Rune",
@@ -51,6 +73,20 @@ var items: Dictionary = {
 		"type": "rune",
 		"rarity": "rare",
 		"icon_color": Color(0.2, 0.8, 0.4),
+	},
+	"rune_of_the_wild": {
+		"display_name": "Rune of the Wild",
+		"description": "A powerful rune forged from the forest guardian's essence. Unlocks the Frostpeak Tundra.",
+		"type": "rune",
+		"rarity": "epic",
+		"icon_color": Color(0.1, 0.9, 0.3),
+	},
+	"tundra_rune": {
+		"display_name": "Tundra Rune",
+		"description": "A rune infused with frost energy. Used to unlock tundra paths.",
+		"type": "rune",
+		"rarity": "rare",
+		"icon_color": Color(0.5, 0.8, 1.0),
 	},
 }
 

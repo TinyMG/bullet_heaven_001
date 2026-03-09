@@ -21,6 +21,23 @@ var recipes: Array[Dictionary] = [
 			{"item_id": "dark_petal", "count": 2},
 		],
 	},
+	{
+		"result_id": "rune_of_the_wild",
+		"result_count": 1,
+		"ingredients": [
+			{"item_id": "hollow_core", "count": 3},
+			{"item_id": "ancient_bark", "count": 4},
+			{"item_id": "beast_fang", "count": 2},
+		],
+	},
+	{
+		"result_id": "tundra_rune",
+		"result_count": 1,
+		"ingredients": [
+			{"item_id": "frost_wisp", "count": 5},
+			{"item_id": "frozen_claw", "count": 3},
+		],
+	},
 ]
 
 func get_recipes() -> Array[Dictionary]:

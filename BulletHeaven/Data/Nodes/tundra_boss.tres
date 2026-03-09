@@ -1,0 +1,21 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Data/map_node_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+node_id = "tundra_boss"
+display_name = "Yeti's Peak"
+description = "The summit where the Yeti reigns. Only the brave dare enter."
+position_on_map = Vector2(600, 500)
+wave_count = 6
+base_enemies_per_wave = 6
+enemy_hp_base = 40.0
+enemy_hp_per_wave = 5.0
+boss_on_final_wave = true
+difficulty_modifier = 1.6
+unlock_requires = Array[String](["tundra_02"])
+rune_required = "tundra_rune"
+region = "tundra"
+enemy_loot_table = Array[Dictionary]([{"item_id": "frost_wisp", "drop_chance": 0.3}, {"item_id": "frozen_claw", "drop_chance": 0.25}])
+boss_loot_table = Array[Dictionary]([{"item_id": "yeti_heart", "drop_chance": 1.0}, {"item_id": "frozen_claw", "drop_chance": 1.0}])

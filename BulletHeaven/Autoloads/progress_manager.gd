@@ -6,12 +6,22 @@ extends Node
 const SAVE_PATH: String = "user://save_data.json"
 
 signal inventory_changed(item_id: String, new_count: int)
+signal region_unlocked(region_id: String)
 
 var completed_nodes: Array = []
 var current_node: Resource = null
+var unlocked_regions: Array = ["forest"]  # Forest unlocked by default
 
 # Inventory: item_id -> count
 var inventory: Dictionary = {}
+
+# Maps boss node_id -> region_id that it unlocks
+var boss_unlock_map: Dictionary = {
+	"forest_boss": "tundra",
+	"tundra_boss": "ruins",
+	"ruins_boss": "depths",
+	"depths_boss": "nexus",
+}
 
 func _ready() -> void:
 	load_game()
@@ -45,7 +55,20 @@ func select_node(node_data: Resource) -> void:
 func complete_node(node_id: String) -> void:
 	if node_id not in completed_nodes:
 		completed_nodes.append(node_id)
+	# Check if this boss unlocks a new region
+	if boss_unlock_map.has(node_id):
+		var new_region = boss_unlock_map[node_id]
+		if new_region not in unlocked_regions:
+			unlock_region(new_region)
 	save_game()
+
+func unlock_region(region_id: String) -> void:
+	if region_id not in unlocked_regions:
+		unlocked_regions.append(region_id)
+		region_unlocked.emit(region_id)
+
+func is_region_unlocked(region_id: String) -> bool:
+	return region_id in unlocked_regions
 
 # --- Inventory ---
 
@@ -79,6 +102,7 @@ func save_game() -> void:
 	var data: Dictionary = {
 		"completed_nodes": completed_nodes,
 		"inventory": inventory,
+		"unlocked_regions": unlocked_regions,
 	}
 	var file = FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file == null:
@@ -108,6 +132,10 @@ func load_game() -> void:
 		completed_nodes = Array(data["completed_nodes"])
 	if data.has("inventory"):
 		inventory = data["inventory"]
+	if data.has("unlocked_regions"):
+		unlocked_regions = Array(data["unlocked_regions"])
+	else:
+		unlocked_regions = ["forest"]
 
 func delete_save() -> void:
 	if FileAccess.file_exists(SAVE_PATH):
@@ -116,5 +144,6 @@ func delete_save() -> void:
 func reset() -> void:
 	completed_nodes.clear()
 	inventory.clear()
+	unlocked_regions = ["forest"]
 	current_node = null
 	delete_save()
