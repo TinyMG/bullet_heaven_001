@@ -101,7 +101,33 @@ func _create_recipe_row(recipe: Dictionary) -> PanelContainer:
 func _on_craft_pressed(recipe: Dictionary) -> void:
 	if RecipeDatabase.craft(recipe):
 		ProgressManager.save_game()
+		# Flash success glow before repopulating
+		var result_name = ItemDatabase.get_display_name(recipe["result_id"])
+		_show_craft_glow(result_name)
 		_populate()
+
+func _show_craft_glow(item_name: String) -> void:
+	var flash = ColorRect.new()
+	flash.color = Color(0.2, 1.0, 0.3, 0.4)
+	flash.anchors_preset = Control.PRESET_FULL_RECT
+	flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_child(flash)
+
+	var label = Label.new()
+	label.text = "Crafted %s!" % item_name
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.anchors_preset = Control.PRESET_CENTER
+	label.add_theme_font_size_override("font_size", 22)
+	label.add_theme_color_override("font_color", Color(0.1, 1.0, 0.3))
+	label.add_theme_color_override("font_outline_color", Color(0, 0, 0))
+	label.add_theme_constant_override("outline_size", 3)
+	flash.add_child(label)
+
+	var tween = flash.create_tween()
+	tween.tween_property(flash, "color:a", 0.0, 0.6)
+	tween.parallel().tween_property(label, "modulate:a", 0.0, 0.6).set_delay(0.3)
+	tween.tween_callback(flash.queue_free)
 
 func _on_close_pressed() -> void:
 	visible = false
