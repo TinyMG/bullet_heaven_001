@@ -58,6 +58,7 @@ func _process(_delta: float) -> void:
 		var enemies = get_tree().get_nodes_in_group("Enemy")
 		if enemies.is_empty():
 			waves_done = true
+			_show_wave_cleared_text()
 			GameManager.waves_completed.emit()
 
 func _on_spawn_timer_timeout() -> void:
@@ -70,12 +71,14 @@ func _on_spawn_timer_timeout() -> void:
 		return
 
 	current_wave += 1
+	_show_wave_text()
 	var count = base_enemies_per_wave + int(current_wave * 0.5)
 	_spawn_wave(count)
 
 	# Spawn boss on final wave in finite mode
 	if boss_on_final_wave and current_wave == max_waves:
 		_spawn_boss()
+		_show_wave_text_boss()
 
 	# Stop timer after last wave
 	if max_waves > 0 and current_wave >= max_waves:
@@ -134,3 +137,107 @@ func _spawn_boss() -> void:
 	var boss_bar = get_tree().current_scene.get_node_or_null("BossHPBar")
 	if boss_bar and boss_bar.has_method("track_boss"):
 		boss_bar.call_deferred("track_boss", boss)
+
+func _show_wave_cleared_text() -> void:
+	var canvas = CanvasLayer.new()
+	canvas.layer = 10
+
+	var label = Label.new()
+	label.text = "WAVES CLEARED!"
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 42)
+	label.add_theme_color_override("font_color", Color(0.2, 1.0, 0.4, 1.0))
+	label.add_theme_color_override("font_outline_color", Color(0, 0, 0))
+	label.add_theme_constant_override("outline_size", 3)
+	label.anchors_preset = Control.PRESET_CENTER
+	label.anchor_left = 0.5
+	label.anchor_right = 0.5
+	label.anchor_top = 0.5
+	label.anchor_bottom = 0.5
+	label.offset_left = -200.0
+	label.offset_right = 200.0
+	label.offset_top = -30.0
+	label.offset_bottom = 30.0
+	label.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	label.grow_vertical = Control.GROW_DIRECTION_BOTH
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	canvas.add_child(label)
+
+	# Slide in from left
+	label.position.x = -400
+	label.modulate.a = 0.0
+	get_tree().current_scene.add_child.call_deferred(canvas)
+
+	var tween = label.create_tween()
+	tween.tween_property(label, "position:x", 0.0, 0.4).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	tween.parallel().tween_property(label, "modulate:a", 1.0, 0.2)
+	tween.tween_interval(1.5)
+	tween.tween_property(label, "modulate:a", 0.0, 0.5)
+	tween.tween_callback(canvas.queue_free)
+
+func _show_wave_text() -> void:
+	var wave_text = ""
+	if max_waves > 0:
+		wave_text = "Wave %d / %d" % [current_wave, max_waves]
+	else:
+		wave_text = "Wave %d" % current_wave
+
+	var canvas = CanvasLayer.new()
+	canvas.layer = 10
+
+	var label = Label.new()
+	label.text = wave_text
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 36)
+	label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 1.0))
+	label.anchors_preset = Control.PRESET_CENTER_TOP
+	label.anchor_left = 0.5
+	label.anchor_right = 0.5
+	label.offset_left = -150.0
+	label.offset_right = 150.0
+	label.offset_top = 80.0
+	label.offset_bottom = 130.0
+	label.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	canvas.add_child(label)
+	get_tree().current_scene.add_child.call_deferred(canvas)
+
+	# Fade out after 1.5 seconds
+	var tween = label.create_tween()
+	tween.tween_interval(1.0)
+	tween.tween_property(label, "modulate:a", 0.0, 0.5)
+	tween.tween_callback(canvas.queue_free)
+
+func _show_wave_text_boss() -> void:
+	var canvas = CanvasLayer.new()
+	canvas.layer = 11
+
+	var label = Label.new()
+	label.text = "BOSS INCOMING!"
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 28)
+	label.add_theme_color_override("font_color", Color(1.0, 0.3, 0.2, 1.0))
+	label.anchors_preset = Control.PRESET_CENTER_TOP
+	label.anchor_left = 0.5
+	label.anchor_right = 0.5
+	label.offset_left = -150.0
+	label.offset_right = 150.0
+	label.offset_top = 120.0
+	label.offset_bottom = 160.0
+	label.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	canvas.add_child(label)
+	get_tree().current_scene.add_child.call_deferred(canvas)
+
+	# Pulse then fade
+	var tween = label.create_tween()
+	tween.tween_property(label, "modulate:a", 0.4, 0.3)
+	tween.tween_property(label, "modulate:a", 1.0, 0.3)
+	tween.tween_property(label, "modulate:a", 0.4, 0.3)
+	tween.tween_property(label, "modulate:a", 1.0, 0.3)
+	tween.tween_interval(0.5)
+	tween.tween_property(label, "modulate:a", 0.0, 0.5)
+	tween.tween_callback(canvas.queue_free)

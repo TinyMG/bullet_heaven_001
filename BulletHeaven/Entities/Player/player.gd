@@ -46,8 +46,9 @@ func _ready() -> void:
 	fire_timer.timeout.connect(_on_fire_timer_timeout)
 	_update_magnet_radius()
 	
-	# Connect skill upgrades
+	# Connect skill upgrades and level-up effects
 	SkillsManager.skill_upgraded.connect(_on_skill_upgraded)
+	GameManager.player_leveled_up.connect(_on_leveled_up)
 	
 	# Connect hurtbox
 	hurtbox.area_entered.connect(_on_hurtbox_area_entered)
@@ -240,6 +241,33 @@ func _on_hurtbox_area_entered(area: Area2D) -> void:
 		var dmg = enemy.contact_damage if enemy.has_method("take_damage") else 10.0
 		take_damage(dmg)
 		_push_enemy(enemy)
+
+func _on_leveled_up(_new_level: int) -> void:
+	_spawn_level_up_burst()
+
+func _spawn_level_up_burst() -> void:
+	var particles = CPUParticles2D.new()
+	particles.emitting = true
+	particles.one_shot = true
+	particles.explosiveness = 1.0
+	particles.amount = 24
+	particles.lifetime = 0.6
+	particles.direction = Vector2.ZERO
+	particles.spread = 180.0
+	particles.initial_velocity_min = 80.0
+	particles.initial_velocity_max = 160.0
+	particles.gravity = Vector2.ZERO
+	particles.scale_amount_min = 3.0
+	particles.scale_amount_max = 5.0
+	particles.color = Color(1.0, 0.9, 0.2, 1.0)
+	var gradient = Gradient.new()
+	gradient.set_color(0, Color(1.0, 0.9, 0.2, 1.0))
+	gradient.set_color(1, Color(0.2, 1.0, 0.4, 0.0))
+	particles.color_ramp = gradient
+	particles.global_position = global_position
+	get_tree().current_scene.add_child(particles)
+	# Auto-cleanup after particles finish
+	get_tree().create_timer(1.0).timeout.connect(particles.queue_free)
 
 func _push_enemy(enemy: Node2D) -> void:
 	if enemy is CharacterBody2D:

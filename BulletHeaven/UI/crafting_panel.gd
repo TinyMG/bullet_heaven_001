@@ -100,6 +100,7 @@ func _create_recipe_row(recipe: Dictionary) -> PanelContainer:
 
 func _on_craft_pressed(recipe: Dictionary) -> void:
 	if RecipeDatabase.craft(recipe):
+		ProgressManager.save_game()
 		_populate()
 
 func _on_close_pressed() -> void:

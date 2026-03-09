@@ -20,6 +20,9 @@ var inventory: Dictionary = {}
 var equipped_weapon: String = ""
 var equipped_armor: String = ""
 
+# Tracks drops collected during current combat run
+var run_loot: Dictionary = {}  # item_id -> count
+
 # Maps boss node_id -> region_id that it unlocks
 var boss_unlock_map: Dictionary = {
 	"forest_boss": "tundra",
@@ -55,6 +58,7 @@ func is_node_completed(node_id: String) -> bool:
 
 func select_node(node_data: Resource) -> void:
 	current_node = node_data
+	run_loot.clear()
 	get_tree().change_scene_to_file("res://Scenes/Main.tscn")
 
 func complete_node(node_id: String) -> void:
@@ -138,6 +142,11 @@ func add_item(item_id: String, amount: int = 1) -> void:
 		inventory[item_id] += amount
 	else:
 		inventory[item_id] = amount
+	# Track run loot
+	if run_loot.has(item_id):
+		run_loot[item_id] += amount
+	else:
+		run_loot[item_id] = amount
 	inventory_changed.emit(item_id, inventory[item_id])
 
 func remove_item(item_id: String, amount: int = 1) -> bool:

@@ -79,8 +79,32 @@ func _on_body_entered(body: Node2D) -> void:
 		target = body
 
 func _collect() -> void:
+	_spawn_pickup_text()
 	ProgressManager.add_item(item_id)
 	_release()
+
+func _spawn_pickup_text() -> void:
+	var item_data = ItemDatabase.get_item(item_id)
+	var display_name = item_data.get("display_name", item_id)
+	var rarity = item_data.get("rarity", "common")
+	var color = ItemDatabase.get_rarity_color(rarity)
+
+	var float_label = Label.new()
+	float_label.text = "+%s" % display_name
+	float_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	float_label.add_theme_font_size_override("font_size", 14)
+	float_label.add_theme_color_override("font_color", color)
+	float_label.add_theme_color_override("font_outline_color", Color(0, 0, 0))
+	float_label.add_theme_constant_override("outline_size", 2)
+	float_label.global_position = global_position + Vector2(-40, -20)
+	float_label.z_index = 100
+	get_tree().current_scene.add_child(float_label)
+
+	var tween = float_label.create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(float_label, "position:y", float_label.position.y - 40, 0.9).set_ease(Tween.EASE_OUT)
+	tween.tween_property(float_label, "modulate:a", 0.0, 0.9).set_delay(0.3)
+	tween.chain().tween_callback(float_label.queue_free)
 
 func _release() -> void:
 	set_deferred("monitoring", false)
