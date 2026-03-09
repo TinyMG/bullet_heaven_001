@@ -190,13 +190,15 @@ func _play_death_anim() -> void:
 		remove_from_group("Enemy")
 
 	_set_anim("death")
-	# Total frames in death sheet
-	var total_frames = sheet_hframes * sheet_vframes
-	var frame_time = anim_delay
+	# Play only the first row of frames at fast speed
+	var total_frames = sheet_hframes
+	var frame_time = 0.05
 	var tween = create_tween()
 	for i in range(total_frames):
 		tween.tween_callback(func(): sprite.frame = i)
 		tween.tween_interval(frame_time)
+	# Fade out at the end
+	tween.tween_property(sprite, "modulate:a", 0.0, 0.15)
 	tween.tween_callback(_release)
 
 func _release() -> void:

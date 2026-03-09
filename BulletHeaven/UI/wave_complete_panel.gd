@@ -12,10 +12,13 @@ extends CanvasLayer
 @onready var loot_container: VBoxContainer = $PanelContainer/VBoxContainer/LootContainer
 @onready var continue_button: Button = $PanelContainer/VBoxContainer/ContinueButton
 
+var _loot_snapshot: Dictionary = {}
+
 func _ready() -> void:
 	visible = false
 	GameManager.waves_completed.connect(_on_waves_completed)
 	continue_button.pressed.connect(_on_continue_pressed)
+	ProgressManager.inventory_changed.connect(_on_inventory_changed)
 
 func _on_waves_completed() -> void:
 	var node_data: Resource = ProgressManager.current_node
@@ -40,6 +43,7 @@ func _populate_loot_summary() -> void:
 		child.queue_free()
 
 	var loot = ProgressManager.run_loot
+	_loot_snapshot = loot.duplicate()
 	if loot.is_empty():
 		var none_label = Label.new()
 		none_label.text = "No drops collected"
@@ -62,6 +66,12 @@ func _populate_loot_summary() -> void:
 		label.add_theme_font_size_override("font_size", 13)
 		label.add_theme_color_override("font_color", color)
 		loot_container.add_child(label)
+
+func _on_inventory_changed(_item_id: String, _new_count: int) -> void:
+	if visible:
+		# Only refresh if run_loot actually changed
+		if ProgressManager.run_loot != _loot_snapshot:
+			_populate_loot_summary()
 
 func _on_continue_pressed() -> void:
 	get_tree().paused = false
