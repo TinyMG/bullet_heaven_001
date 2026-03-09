@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" path="res://UI/PauseMenu.tscn" id="8_pause"]
 [ext_resource type="PackedScene" path="res://UI/BossHPBar.tscn" id="9_bossbar"]
 [ext_resource type="PackedScene" path="res://UI/WaveCompletePanel.tscn" id="10_wavecomplete"]
+[ext_resource type="PackedScene" path="res://UI/CombatMinimap.tscn" id="11_minimap"]
 
 [node name="Main" type="Node2D" unique_id=1962864037]
 script = ExtResource("1_main")
@@ -50,3 +51,5 @@ autostart = true
 [node name="BossHPBar" parent="." instance=ExtResource("9_bossbar")]
 
 [node name="WaveCompletePanel" parent="." instance=ExtResource("10_wavecomplete")]
+
+[node name="CombatMinimap" parent="." instance=ExtResource("11_minimap")]
