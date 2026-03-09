@@ -38,7 +38,7 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -320.0
-offset_top = -300.0
+offset_top = -460.0
 offset_right = -20.0
 offset_bottom = -20.0
 grow_horizontal = 0
@@ -74,9 +74,28 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 14
 theme_override_colors/font_color = Color(0.8, 0.5, 1.0, 1)
 
-[node name="Control" type="Control" parent="CanvasLayer/InfoPanel/VBoxContainer"]
-custom_minimum_size = Vector2(0, 10)
+[node name="HSeparator" type="HSeparator" parent="CanvasLayer/InfoPanel/VBoxContainer"]
 layout_mode = 2
+
+[node name="ModifiersLabel" type="Label" parent="CanvasLayer/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(1.0, 0.85, 0.3, 1)
+text = "Modifiers (optional):"
+
+[node name="ModifiersContainer" type="VBoxContainer" parent="CanvasLayer/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Control" type="Control" parent="CanvasLayer/InfoPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 2
+
+[node name="BonusLabel" type="Label" parent="CanvasLayer/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.5, 1.0, 0.5, 1)
+text = ""
 
 [node name="StartButton" type="Button" parent="CanvasLayer/InfoPanel/VBoxContainer"]
 custom_minimum_size = Vector2(200, 50)

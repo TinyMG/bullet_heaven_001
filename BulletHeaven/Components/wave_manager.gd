@@ -34,6 +34,9 @@ func _ready() -> void:
 		node_difficulty = node_data.difficulty_modifier
 		boss_on_final_wave = node_data.boss_on_final_wave
 
+	# Apply node modifiers
+	_apply_modifiers()
+
 	spawn_timer.wait_time = wave_interval
 	spawn_timer.start()
 	spawn_timer.timeout.connect(_on_spawn_timer_timeout)
@@ -137,6 +140,18 @@ func _spawn_boss() -> void:
 	var boss_bar = get_tree().current_scene.get_node_or_null("BossHPBar")
 	if boss_bar and boss_bar.has_method("track_boss"):
 		boss_bar.call_deferred("track_boss", boss)
+
+func _apply_modifiers() -> void:
+	var mods = ProgressManager.active_modifiers
+	if "tough_enemies" in mods:
+		node_enemy_hp_base *= 1.5
+		node_enemy_hp_per_wave *= 1.5
+	if "fast_enemies" in mods:
+		node_difficulty *= 1.4
+	if "extra_waves" in mods:
+		if max_waves > 0:
+			max_waves += 2
+	# "no_regen" is handled in player.gd
 
 func _show_wave_cleared_text() -> void:
 	var canvas = CanvasLayer.new()

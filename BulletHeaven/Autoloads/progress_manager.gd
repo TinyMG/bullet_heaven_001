@@ -23,6 +23,40 @@ var equipped_armor: String = ""
 # Tracks drops collected during current combat run
 var run_loot: Dictionary = {}  # item_id -> count
 
+# Node modifiers selected by the player before entering combat
+var active_modifiers: Array[String] = []
+
+# Modifier definitions: id -> { label, description, effect }
+const MODIFIER_DEFS: Dictionary = {
+	"tough_enemies": {
+		"label": "+50% Enemy HP",
+		"description": "Enemies have 50% more health",
+		"drop_bonus": 0.25,
+	},
+	"fast_enemies": {
+		"label": "+40% Enemy Speed",
+		"description": "Enemies move 40% faster",
+		"drop_bonus": 0.20,
+	},
+	"extra_waves": {
+		"label": "+2 Waves",
+		"description": "Two additional waves of enemies",
+		"drop_bonus": 0.30,
+	},
+	"no_regen": {
+		"label": "No HP Regen",
+		"description": "HP regeneration is disabled",
+		"drop_bonus": 0.15,
+	},
+}
+
+func get_total_drop_bonus() -> float:
+	var bonus: float = 0.0
+	for mod_id in active_modifiers:
+		if MODIFIER_DEFS.has(mod_id):
+			bonus += MODIFIER_DEFS[mod_id]["drop_bonus"]
+	return bonus
+
 # Maps boss node_id -> region_id that it unlocks
 var boss_unlock_map: Dictionary = {
 	"forest_boss": "tundra",

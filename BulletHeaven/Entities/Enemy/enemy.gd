@@ -191,8 +191,9 @@ func _roll_loot() -> void:
 	else:
 		loot_table = node_data.enemy_loot_table
 
+	var drop_bonus: float = ProgressManager.get_total_drop_bonus()
 	for entry in loot_table:
-		var chance: float = entry.get("drop_chance", 0.0)
+		var chance: float = entry.get("drop_chance", 0.0) + drop_bonus
 		if randf() <= chance:
 			var drop = ObjectPool.get_instance(loot_drop_scene)
 			var offset = Vector2(randf_range(-15, 15), randf_range(-15, 15))

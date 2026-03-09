@@ -62,7 +62,7 @@ func _physics_process(delta: float) -> void:
 	var input_vector = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	var speed = base_speed + SkillsManager.get_skill_value("move_speed") + ProgressManager.get_equipment_stat("move_speed")
 	
-	var is_boosting = Input.is_key_pressed(KEY_SHIFT) or Input.is_physical_key_pressed(KEY_SHIFT)
+	var is_boosting = Input.is_action_pressed("boost")
 	if is_boosting:
 		speed *= 1.5
 		
@@ -104,10 +104,11 @@ func _physics_process(delta: float) -> void:
 		# set frame
 		sprite.frame = (row * 10) + anim_current
 	
-	# HP regen from skills + equipment
-	var regen = SkillsManager.get_skill_value("hp_regen") + ProgressManager.get_equipment_stat("hp_regen")
-	if regen > 0.0 and current_hp < max_hp:
-		current_hp = min(current_hp + regen * delta, max_hp)
+	# HP regen from skills + equipment (disabled by no_regen modifier)
+	if "no_regen" not in ProgressManager.active_modifiers:
+		var regen = SkillsManager.get_skill_value("hp_regen") + ProgressManager.get_equipment_stat("hp_regen")
+		if regen > 0.0 and current_hp < max_hp:
+			current_hp = min(current_hp + regen * delta, max_hp)
 
 	# Continuous contact damage from overlapping enemies
 	if contact_damage_cooldown > 0.0:

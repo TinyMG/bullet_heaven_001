@@ -10,6 +10,9 @@ extends Node2D
 @onready var info_waves: Label = $CanvasLayer/InfoPanel/VBoxContainer/WavesLabel
 @onready var info_difficulty: Label = $CanvasLayer/InfoPanel/VBoxContainer/DifficultyLabel
 @onready var rune_label: Label = $CanvasLayer/InfoPanel/VBoxContainer/RuneLabel
+@onready var modifiers_container: VBoxContainer = $CanvasLayer/InfoPanel/VBoxContainer/ModifiersContainer
+@onready var modifiers_label: Label = $CanvasLayer/InfoPanel/VBoxContainer/ModifiersLabel
+@onready var bonus_label: Label = $CanvasLayer/InfoPanel/VBoxContainer/BonusLabel
 @onready var start_button: Button = $CanvasLayer/InfoPanel/VBoxContainer/StartButton
 @onready var back_button: Button = $CanvasLayer/BackButton
 @onready var inventory_button: Button = $CanvasLayer/InventoryButton
@@ -135,10 +138,18 @@ func _on_node_selected(data: Resource) -> void:
 	else:
 		start_button.text = "Locked"
 		start_button.disabled = true
+
+	# Populate modifier checkboxes
+	_populate_modifiers(not start_button.disabled)
 	info_panel.visible = true
 
 func _on_start_pressed() -> void:
 	if selected_node and ProgressManager.is_node_unlocked(selected_node):
+		# Collect active modifiers from checkboxes
+		ProgressManager.active_modifiers.clear()
+		for child in modifiers_container.get_children():
+			if child is CheckBox and child.button_pressed:
+				ProgressManager.active_modifiers.append(child.name)
 		# Consume rune if required
 		ProgressManager.use_rune_for_node(selected_node)
 		ProgressManager.save_game()
@@ -155,6 +166,38 @@ func _on_crafting_pressed() -> void:
 
 func _on_equip_pressed() -> void:
 	equipment_panel.show_equipment()
+
+func _populate_modifiers(enabled: bool) -> void:
+	for child in modifiers_container.get_children():
+		child.queue_free()
+
+	for mod_id in ProgressManager.MODIFIER_DEFS:
+		var def = ProgressManager.MODIFIER_DEFS[mod_id]
+		var cb = CheckBox.new()
+		cb.name = mod_id
+		cb.text = "%s (+%d%% drops)" % [def["label"], int(def["drop_bonus"] * 100)]
+		cb.add_theme_font_size_override("font_size", 12)
+		cb.disabled = not enabled
+		cb.toggled.connect(_on_modifier_toggled)
+		modifiers_container.add_child(cb)
+
+	_update_bonus_label()
+
+func _on_modifier_toggled(_pressed: bool) -> void:
+	_update_bonus_label()
+
+func _update_bonus_label() -> void:
+	var total_bonus: float = 0.0
+	for child in modifiers_container.get_children():
+		if child is CheckBox and child.button_pressed:
+			var mod_id = child.name
+			if ProgressManager.MODIFIER_DEFS.has(mod_id):
+				total_bonus += ProgressManager.MODIFIER_DEFS[mod_id]["drop_bonus"]
+
+	if total_bonus > 0.0:
+		bonus_label.text = "Drop rate bonus: +%d%%" % int(total_bonus * 100)
+	else:
+		bonus_label.text = ""
 
 func _draw() -> void:
 	var offset = Vector2(0, -scroll_offset)
