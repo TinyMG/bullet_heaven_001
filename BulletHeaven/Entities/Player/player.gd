@@ -32,6 +32,15 @@ enum AnimState {
 	IDLE, RUN, SHOOT, BOOST
 }
 var current_anim_state: AnimState = AnimState.IDLE
+var _prev_anim_state: AnimState = AnimState.IDLE
+
+# Number of actual frames per animation row in the sprite sheet
+const ANIM_FRAME_COUNTS: Dictionary = {
+	AnimState.IDLE: 6,
+	AnimState.RUN: 10,
+	AnimState.SHOOT: 6,
+	AnimState.BOOST: 6,
+}
 
 # I-frames
 var is_invincible: bool = false
@@ -43,6 +52,10 @@ var contact_damage_interval: float = 0.5  # seconds between contact damage ticks
 # Slow debuff (from frost trails)
 var slow_stack_count: int = 0
 var speed_modifier: float = 1.0
+
+# Cached stat values (updated on skill upgrade / equip change, not every frame)
+var _cached_move_speed: float = 0.0
+var _cached_hp_regen: float = 0.0
 
 func _ready() -> void:
 	GameManager.player = self
@@ -59,14 +72,18 @@ func _ready() -> void:
 	# Connect hurtbox
 	hurtbox.area_entered.connect(_on_hurtbox_area_entered)
 
+	# Listen for equipment changes
+	ProgressManager.equipment_changed.connect(_update_cached_stats)
+
 	# Apply equipment stats at combat start
 	_update_fire_rate()
 	_update_max_hp()
+	_update_cached_stats()
 	current_hp = max_hp
 
 func _physics_process(delta: float) -> void:
 	var input_vector = Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	var speed = base_speed + SkillsManager.get_skill_value("move_speed") + ProgressManager.get_equipment_stat("move_speed")
+	var speed = base_speed + _cached_move_speed
 	
 	var is_boosting = Input.is_action_pressed("boost")
 	if is_boosting:
@@ -75,17 +92,17 @@ func _physics_process(delta: float) -> void:
 	velocity = input_vector * speed * speed_modifier
 	move_and_slide()
 	
-	# Determine state
+	# Determine state — BOOST takes priority over SHOOT so auto-fire doesn't flicker
 	shoot_anim_timer -= delta
-	if shoot_anim_timer > 0.0:
-		current_anim_state = AnimState.SHOOT
-	elif is_boosting and velocity.length() > 0.0:
+	if is_boosting and velocity.length() > 0.0:
 		current_anim_state = AnimState.BOOST
+	elif shoot_anim_timer > 0.0:
+		current_anim_state = AnimState.SHOOT
 	elif velocity.length() > 0.0:
 		current_anim_state = AnimState.RUN
 	else:
 		current_anim_state = AnimState.IDLE
-		
+
 	# Flip sprite handling
 	if velocity.x != 0:
 		sprite.flip_h = velocity.x < 0
@@ -96,23 +113,42 @@ func _physics_process(delta: float) -> void:
 		elif nearest:
 			sprite.flip_h = false
 
-	# Play animation
-	anim_timer += delta
-	if anim_timer >= anim_delay:
+	# Get row, frame count, and speed for current state
+	var row: int = 0
+	var frame_count: int = 10
+	var anim_speed: float = anim_delay
+	var static_frame: int = -1  # -1 means animate, >= 0 means lock to that column
+	match current_anim_state:
+		AnimState.IDLE:
+			row = 0; frame_count = 6
+		AnimState.RUN:
+			row = 1; frame_count = 10
+		AnimState.SHOOT:
+			row = 2; frame_count = 6
+		AnimState.BOOST:
+			row = 3; static_frame = 2  # Lock to frame 2 of boost row
+
+	# Reset frame counter when animation state changes
+	if current_anim_state != _prev_anim_state:
+		anim_current = 0
 		anim_timer = 0.0
-		anim_current = (anim_current + 1) % 10
-		var row = 0
-		if current_anim_state == AnimState.IDLE:     row = 0
-		elif current_anim_state == AnimState.RUN:    row = 1
-		elif current_anim_state == AnimState.SHOOT:  row = 2
-		elif current_anim_state == AnimState.BOOST:  row = 3
-		
-		# set frame
-		sprite.frame = (row * 10) + anim_current
+		_prev_anim_state = current_anim_state
+		if static_frame >= 0:
+			sprite.frame = row * 10 + static_frame
+		else:
+			sprite.frame = row * 10
+
+	# Advance animation (skip if static frame)
+	if static_frame < 0:
+		anim_timer += delta
+		if anim_timer >= anim_speed:
+			anim_timer = 0.0
+			anim_current = (anim_current + 1) % frame_count
+			sprite.frame = row * 10 + anim_current
 	
 	# HP regen from skills + equipment (disabled by no_regen modifier)
 	if "no_regen" not in ProgressManager.active_modifiers:
-		var regen = SkillsManager.get_skill_value("hp_regen") + ProgressManager.get_equipment_stat("hp_regen")
+		var regen = _cached_hp_regen
 		if regen > 0.0 and current_hp < max_hp:
 			current_hp = min(current_hp + regen * delta, max_hp)
 
@@ -128,6 +164,14 @@ func _physics_process(delta: float) -> void:
 				take_damage(dmg)
 				_push_enemy(enemy)
 				break  # Only take damage from one enemy per tick
+
+func _get_anim_row(state: AnimState) -> int:
+	match state:
+		AnimState.IDLE:  return 0
+		AnimState.RUN:   return 1
+		AnimState.SHOOT: return 2
+		AnimState.BOOST: return 3
+	return 0
 
 func _on_fire_timer_timeout() -> void:
 	var nearest = _find_nearest_enemy()
@@ -261,6 +305,7 @@ func _fire_aoe(target: Node2D) -> void:
 			proj.activate()
 
 func _on_skill_upgraded(skill_name: String, _new_rank: int) -> void:
+	_update_cached_stats()
 	match skill_name:
 		"fire_rate":
 			_update_fire_rate()
@@ -281,6 +326,10 @@ func _update_max_hp() -> void:
 func _update_magnet_radius() -> void:
 	var radius = base_magnet_radius + SkillsManager.get_skill_value("pickup_radius")
 	(magnet_collision.shape as CircleShape2D).radius = radius
+
+func _update_cached_stats() -> void:
+	_cached_move_speed = SkillsManager.get_skill_value("move_speed") + ProgressManager.get_equipment_stat("move_speed")
+	_cached_hp_regen = SkillsManager.get_skill_value("hp_regen") + ProgressManager.get_equipment_stat("hp_regen")
 
 func take_damage(amount: float) -> void:
 	if is_invincible:
@@ -363,10 +412,9 @@ func _spawn_level_up_burst() -> void:
 	get_tree().create_timer(1.0).timeout.connect(particles.queue_free)
 
 func _push_enemy(enemy: Node2D) -> void:
-	if enemy is CharacterBody2D:
+	if enemy.has_method("apply_knockback"):
 		var push_dir = (enemy.global_position - global_position).normalized()
-		enemy.velocity = push_dir * 200.0
-		enemy.move_and_slide()
+		enemy.apply_knockback(push_dir, 350.0, 0.25)
 
 func apply_slow() -> void:
 	slow_stack_count += 1

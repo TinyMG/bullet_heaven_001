@@ -11,6 +11,14 @@ extends Node
 @onready var music_player: AudioStreamPlayer = $MusicPlayer
 
 var _current_music_key: String = ""
+var _music_cache: Dictionary = {}  # region_key -> AudioStream
+
+func _ready() -> void:
+	# Preload all music themes that exist on disk
+	for region_key in ["menu", "forest", "tundra", "ruins", "depths", "nexus"]:
+		var path = "res://assets/audio/music/%s_theme.ogg" % region_key
+		if ResourceLoader.exists(path):
+			_music_cache[region_key] = load(path)
 
 func play_shoot() -> void:
 	# Randomize pitch slightly for variety
@@ -30,11 +38,10 @@ func play_game_over() -> void:
 func play_music(region_key: String) -> void:
 	if region_key == _current_music_key and music_player.playing:
 		return
-	var path = "res://assets/audio/music/%s_theme.ogg" % region_key
-	if not ResourceLoader.exists(path):
+	if not _music_cache.has(region_key):
 		return
 	_current_music_key = region_key
-	music_player.stream = load(path)
+	music_player.stream = _music_cache[region_key]
 	music_player.play()
 
 func stop_music() -> void:
@@ -44,8 +51,7 @@ func stop_music() -> void:
 func crossfade_music(region_key: String, duration: float = 1.0) -> void:
 	if region_key == _current_music_key and music_player.playing:
 		return
-	var path = "res://assets/audio/music/%s_theme.ogg" % region_key
-	if not ResourceLoader.exists(path):
+	if not _music_cache.has(region_key):
 		return
 	if music_player.playing:
 		var original_db = music_player.volume_db
@@ -53,7 +59,7 @@ func crossfade_music(region_key: String, duration: float = 1.0) -> void:
 		tween.tween_property(music_player, "volume_db", -40.0, duration * 0.5)
 		tween.tween_callback(func():
 			_current_music_key = region_key
-			music_player.stream = load(path)
+			music_player.stream = _music_cache[region_key]
 			music_player.play()
 			music_player.volume_db = -40.0
 		)

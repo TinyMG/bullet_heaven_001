@@ -2,9 +2,26 @@ extends Control
 
 ## MinimapDraw
 ## The drawing surface for the combat minimap.
+## Group queries are cached and refreshed on a timer to avoid per-frame overhead.
 
 var map_radius: float = 70.0
 var world_range: float = 600.0
+
+# Cached group arrays — refreshed every _update_interval seconds
+var _cached_gems: Array = []
+var _cached_drops: Array = []
+var _cached_enemies: Array = []
+var _update_timer: float = 0.0
+const _update_interval: float = 0.15  # ~7 updates per second
+
+func _process(delta: float) -> void:
+	_update_timer -= delta
+	if _update_timer <= 0.0:
+		_update_timer = _update_interval
+		_cached_gems = get_tree().get_nodes_in_group("XPGem")
+		_cached_drops = get_tree().get_nodes_in_group("LootDrop")
+		_cached_enemies = get_tree().get_nodes_in_group("Enemy")
+	queue_redraw()
 
 func _draw() -> void:
 	var center = Vector2(map_radius, map_radius)
@@ -19,45 +36,44 @@ func _draw() -> void:
 	if player == null or not is_instance_valid(player):
 		return
 	var player_pos = player.global_position
+	var inv_range = 1.0 / world_range
+	var draw_radius = map_radius - 4.0
+	var clip_radius = map_radius - 2.0
 
 	# Draw XP gems (cyan dots, tiny) — draw first so they're behind everything
-	var gems = get_tree().get_nodes_in_group("XPGem")
-	for gem in gems:
+	for gem in _cached_gems:
 		if not is_instance_valid(gem) or not gem.visible:
 			continue
 		var offset = gem.global_position - player_pos
 		if offset.length() > world_range:
 			continue
-		var map_pos = center + (offset / world_range) * (map_radius - 4.0)
-		if map_pos.distance_to(center) > map_radius - 2.0:
+		var map_pos = center + offset * inv_range * draw_radius
+		if map_pos.distance_to(center) > clip_radius:
 			continue
 		draw_circle(map_pos, 1.0, Color(0.2, 0.9, 0.9, 0.5))
 
 	# Draw loot drops (blue dots)
-	var drops = get_tree().get_nodes_in_group("LootDrop")
-	for drop in drops:
+	for drop in _cached_drops:
 		if not is_instance_valid(drop) or not drop.visible:
 			continue
 		var offset = drop.global_position - player_pos
 		if offset.length() > world_range:
 			offset = offset.normalized() * world_range
-		var map_pos = center + (offset / world_range) * (map_radius - 4.0)
-		if map_pos.distance_to(center) > map_radius - 2.0:
-			map_pos = center + (map_pos - center).normalized() * (map_radius - 2.0)
+		var map_pos = center + offset * inv_range * draw_radius
+		if map_pos.distance_to(center) > clip_radius:
+			map_pos = center + (map_pos - center).normalized() * clip_radius
 		draw_circle(map_pos, 1.5, Color(0.3, 0.6, 1.0, 0.8))
 
 	# Draw enemies (red dots)
-	var enemies = get_tree().get_nodes_in_group("Enemy")
-	for enemy in enemies:
+	for enemy in _cached_enemies:
 		if not is_instance_valid(enemy) or not enemy.visible:
 			continue
 		var offset = enemy.global_position - player_pos
-		var dist = offset.length()
-		if dist > world_range:
+		if offset.length() > world_range:
 			offset = offset.normalized() * world_range
-		var map_pos = center + (offset / world_range) * (map_radius - 4.0)
-		if map_pos.distance_to(center) > map_radius - 2.0:
-			map_pos = center + (map_pos - center).normalized() * (map_radius - 2.0)
+		var map_pos = center + offset * inv_range * draw_radius
+		if map_pos.distance_to(center) > clip_radius:
+			map_pos = center + (map_pos - center).normalized() * clip_radius
 
 		var dot_size = 2.0
 		var dot_color = Color(1.0, 0.2, 0.2)

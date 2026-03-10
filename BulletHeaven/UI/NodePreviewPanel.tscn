@@ -1,0 +1,192 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://UI/node_preview_panel.gd" id="1_script"]
+
+[node name="NodePreviewPanel" type="CanvasLayer"]
+layer = 20
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.04, 0.04, 0.08, 0.95)
+mouse_filter = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Content" type="VBoxContainer" parent="MarginContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+
+[node name="RegionBanner" type="PanelContainer" parent="MarginContainer/ScrollContainer/Content"]
+layout_mode = 2
+
+[node name="RegionLabel" type="Label" parent="MarginContainer/ScrollContainer/Content/RegionBanner"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "ASHWOOD FOREST"
+horizontal_alignment = 1
+
+[node name="NodeNameLabel" type="Label" parent="MarginContainer/ScrollContainer/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.7, 1)
+theme_override_font_sizes/font_size = 28
+text = "Node Name"
+horizontal_alignment = 1
+
+[node name="DescLabel" type="Label" parent="MarginContainer/ScrollContainer/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 15
+text = "Description"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Sep1" type="HSeparator" parent="MarginContainer/ScrollContainer/Content"]
+layout_mode = 2
+theme_override_colors/separator_color = Color(0.3, 0.3, 0.4, 0.5)
+
+[node name="InfoRow" type="HBoxContainer" parent="MarginContainer/ScrollContainer/Content"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 24
+
+[node name="WavesLabel" type="Label" parent="MarginContainer/ScrollContainer/Content/InfoRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "5 Waves"
+
+[node name="DifficultyLabel" type="Label" parent="MarginContainer/ScrollContainer/Content/InfoRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.5, 1, 0.5, 1)
+text = "Normal"
+
+[node name="BossBadge" type="Label" parent="MarginContainer/ScrollContainer/Content/InfoRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
+text = "BOSS"
+
+[node name="RuneSection" type="HBoxContainer" parent="MarginContainer/ScrollContainer/Content"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 8
+
+[node name="RuneIcon" type="ColorRect" parent="MarginContainer/ScrollContainer/Content/RuneSection"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+color = Color(0.8, 0.5, 1, 1)
+
+[node name="RuneNameLabel" type="Label" parent="MarginContainer/ScrollContainer/Content/RuneSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Rune Name"
+
+[node name="RuneStatusLabel" type="Label" parent="MarginContainer/ScrollContainer/Content/RuneSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "OWNED"
+
+[node name="Sep2" type="HSeparator" parent="MarginContainer/ScrollContainer/Content"]
+layout_mode = 2
+theme_override_colors/separator_color = Color(0.3, 0.3, 0.4, 0.5)
+
+[node name="DropsHeader" type="Label" parent="MarginContainer/ScrollContainer/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+text = "Expected Drops"
+
+[node name="DropsSection" type="PanelContainer" parent="MarginContainer/ScrollContainer/Content"]
+layout_mode = 2
+
+[node name="DropsContainer" type="VBoxContainer" parent="MarginContainer/ScrollContainer/Content/DropsSection"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Sep3" type="HSeparator" parent="MarginContainer/ScrollContainer/Content"]
+layout_mode = 2
+theme_override_colors/separator_color = Color(0.3, 0.3, 0.4, 0.5)
+
+[node name="EquipHeader" type="Label" parent="MarginContainer/ScrollContainer/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
+text = "Current Equipment"
+
+[node name="EquipSection" type="VBoxContainer" parent="MarginContainer/ScrollContainer/Content"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="WeaponLabel" type="Label" parent="MarginContainer/ScrollContainer/Content/EquipSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Weapon: None"
+
+[node name="ArmorLabel" type="Label" parent="MarginContainer/ScrollContainer/Content/EquipSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Armor: None"
+
+[node name="Sep4" type="HSeparator" parent="MarginContainer/ScrollContainer/Content"]
+layout_mode = 2
+theme_override_colors/separator_color = Color(0.3, 0.3, 0.4, 0.5)
+
+[node name="ModifiersHeader" type="Label" parent="MarginContainer/ScrollContainer/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+text = "Modifiers (optional)"
+
+[node name="ModifiersSection" type="VBoxContainer" parent="MarginContainer/ScrollContainer/Content"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ModifiersContainer" type="VBoxContainer" parent="MarginContainer/ScrollContainer/Content/ModifiersSection"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="BonusLabel" type="Label" parent="MarginContainer/ScrollContainer/Content/ModifiersSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.5, 1, 0.5, 1)
+text = ""
+
+[node name="Spacer" type="Control" parent="MarginContainer/ScrollContainer/Content"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+
+[node name="ButtonRow" type="HBoxContainer" parent="MarginContainer/ScrollContainer/Content"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 20
+
+[node name="BackButton" type="Button" parent="MarginContainer/ScrollContainer/Content/ButtonRow"]
+custom_minimum_size = Vector2(140, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Back"
+
+[node name="EnterButton" type="Button" parent="MarginContainer/ScrollContainer/Content/ButtonRow"]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Enter Combat"

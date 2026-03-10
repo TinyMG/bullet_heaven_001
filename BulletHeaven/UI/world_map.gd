@@ -22,6 +22,9 @@ extends Node2D
 @onready var crafting_panel = $CraftingPanel
 @onready var equipment_panel = $EquipmentPanel
 @onready var equip_button: Button = $CanvasLayer/EquipButton
+@onready var runes_button: Button = $CanvasLayer/RunesButton
+@onready var node_preview_panel = $NodePreviewPanel
+@onready var rune_gallery_panel = $RuneGalleryPanel
 
 var map_config: Resource = preload("res://Data/Nodes/world_map.tres")
 var node_button_scene: PackedScene = preload("res://UI/MapNodeButton.tscn")
@@ -64,7 +67,9 @@ func _ready() -> void:
 	inventory_button.pressed.connect(_on_inventory_pressed)
 	crafting_button.pressed.connect(_on_crafting_pressed)
 	equip_button.pressed.connect(_on_equip_pressed)
+	runes_button.pressed.connect(_on_runes_pressed)
 	ProgressManager.region_unlocked.connect(_on_region_unlocked)
+	node_preview_panel.closed.connect(_on_preview_closed)
 	_build_map()
 	set_process_input(true)
 
@@ -180,30 +185,25 @@ func _on_node_selected(data: Resource) -> void:
 	_populate_drop_hints(data)
 
 	if ProgressManager.is_node_completed(data.node_id):
-		start_button.text = "Replay"
+		start_button.text = "View Details"
 		start_button.disabled = false
 	elif ProgressManager.is_node_unlocked(data):
-		start_button.text = "Start"
+		start_button.text = "View Details"
 		start_button.disabled = false
 	else:
 		start_button.text = "Locked"
 		start_button.disabled = true
 
-	# Populate modifier checkboxes
-	_populate_modifiers(not start_button.disabled)
+	# Hide modifier section — modifiers are now on the preview screen
+	modifiers_label.visible = false
+	modifiers_container.visible = false
+	bonus_label.visible = false
 	info_panel.visible = true
 
 func _on_start_pressed() -> void:
-	if selected_node and ProgressManager.is_node_unlocked(selected_node):
-		# Collect active modifiers from checkboxes
-		ProgressManager.active_modifiers.clear()
-		for child in modifiers_container.get_children():
-			if child is CheckBox and child.button_pressed:
-				ProgressManager.active_modifiers.append(child.name)
-		# Consume rune if required
-		ProgressManager.use_rune_for_node(selected_node)
-		ProgressManager.save_game()
-		ProgressManager.select_node(selected_node)
+	if selected_node and (ProgressManager.is_node_unlocked(selected_node) or ProgressManager.is_node_completed(selected_node.node_id)):
+		info_panel.visible = false
+		node_preview_panel.show_preview(selected_node)
 
 func _on_back_pressed() -> void:
 	get_tree().change_scene_to_file("res://UI/MainMenu.tscn")
@@ -216,6 +216,12 @@ func _on_crafting_pressed() -> void:
 
 func _on_equip_pressed() -> void:
 	equipment_panel.show_equipment()
+
+func _on_runes_pressed() -> void:
+	rune_gallery_panel.show_gallery()
+
+func _on_preview_closed() -> void:
+	info_panel.visible = true
 
 func _populate_drop_hints(data: Resource) -> void:
 	# Collect unique item names from both enemy and boss loot tables

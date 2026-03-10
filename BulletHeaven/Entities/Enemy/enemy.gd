@@ -21,6 +21,10 @@ var _default_speed: float = 80.0
 var _default_contact_damage: float = 10.0
 var _ready_done: bool = false
 
+# Knockback state
+var _knockback_velocity: Vector2 = Vector2.ZERO
+var _knockback_timer: float = 0.0
+
 # Boss phase system — phases trigger at 75%, 50%, 25% HP
 var boss_phase: int = 0  # 0 = full, 1 = 75%, 2 = 50%, 3 = 25%
 var _boss_hp_bar: ProgressBar = null
@@ -56,6 +60,8 @@ func activate() -> void:
 	current_hp = max_hp
 	visible = true
 	set_physics_process(true)
+	_knockback_velocity = Vector2.ZERO
+	_knockback_timer = 0.0
 	sprite.modulate = base_modulate
 	# Re-add to groups (removed on release for pool)
 	if not is_in_group("Enemy"):
@@ -84,6 +90,15 @@ func _physics_process(delta: float) -> void:
 	var player = GameManager.player
 	if player == null or GameManager.is_game_over:
 		return
+
+	# Knockback overrides chase movement
+	if _knockback_timer > 0.0:
+		_knockback_timer -= delta
+		_knockback_velocity = _knockback_velocity.lerp(Vector2.ZERO, 5.0 * delta)
+		velocity = _knockback_velocity
+		move_and_slide()
+		return
+
 	var direction = (player.global_position - global_position).normalized()
 	velocity = direction * speed
 	move_and_slide()
@@ -106,15 +121,20 @@ func _physics_process(delta: float) -> void:
 		anim_current = (anim_current + 1) % anim_frame_count
 		sprite.frame = anim_frame_start + anim_current
 
+func apply_knockback(direction: Vector2, force: float = 350.0, duration: float = 0.25) -> void:
+	_knockback_velocity = direction * force
+	_knockback_timer = duration
+
 func take_damage(amount: float) -> void:
 	current_hp -= amount
 	AudioManager.play_hit()
 	GameManager.add_damage_dealt(amount)
 
-	# Spawn floating damage number
-	var dmg_num = damage_number_scene.instantiate()
+	# Spawn floating damage number (pooled)
+	var dmg_num = ObjectPool.get_instance(damage_number_scene)
+	if not dmg_num.is_inside_tree():
+		get_tree().current_scene.add_child.call_deferred(dmg_num)
 	dmg_num.call_deferred("setup", amount, global_position + Vector2(randf_range(-10, 10), -20))
-	get_tree().current_scene.add_child.call_deferred(dmg_num)
 
 	# Flash effect
 	sprite.modulate = Color.RED
@@ -133,14 +153,13 @@ func take_damage(amount: float) -> void:
 		_die()
 
 func _die() -> void:
-	# Spawn death effect
-	var effect = death_effect_scene.instantiate()
+	# Spawn death effect (pooled)
+	var effect = ObjectPool.get_instance(death_effect_scene)
 	effect.global_position = global_position
-	effect.emitting = true
+	if not effect.is_inside_tree():
+		get_tree().current_scene.add_child.call_deferred(effect)
+	effect.call_deferred("activate", is_boss)
 	if is_boss:
-		# Bigger death effect for boss
-		effect.amount = 30
-		effect.scale = Vector2(3.0, 3.0)
 		# Screen flash
 		_boss_screen_flash()
 		# Screen shake
@@ -150,14 +169,6 @@ func _die() -> void:
 				if child.has_method("shake"):
 					child.shake(20.0, 0.6)
 					break
-	get_tree().current_scene.add_child.call_deferred(effect)
-	# Auto-free the effect after its lifetime
-	var timer = Timer.new()
-	timer.wait_time = 1.0
-	timer.one_shot = true
-	timer.autostart = true
-	timer.timeout.connect(effect.queue_free)
-	effect.add_child(timer)
 
 	# Spawn XP gem
 	var gem = ObjectPool.get_instance(xp_gem_scene)

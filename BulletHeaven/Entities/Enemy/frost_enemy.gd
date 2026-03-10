@@ -20,6 +20,9 @@ func _physics_process(delta: float) -> void:
 		_spawn_trail()
 
 func _spawn_trail() -> void:
-	var trail = frost_trail_scene.instantiate()
+	var trail = ObjectPool.get_instance(frost_trail_scene)
 	trail.global_position = global_position
-	get_tree().current_scene.add_child.call_deferred(trail)
+	if not trail.is_inside_tree():
+		get_tree().current_scene.add_child.call_deferred(trail)
+	else:
+		trail.activate()
