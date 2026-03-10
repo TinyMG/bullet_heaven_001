@@ -15,9 +15,10 @@
 4. [Monster Drops & Crafting Recipes](#4-monster-drops--crafting-recipes)
 5. [Claude Code Prompt Library](#5-claude-code-prompt-library)
 6. [Recommended Build Order](#6-recommended-build-order)
-7. [Transition Guide](#7-transition-guide)
-8. [Session Rules](#8-session-rules)
-9. [Multi-Agent Setup](#9-multi-agent-setup)
+7. [Implementation Status](#7-implementation-status)
+8. [Asset Guide](#8-asset-guide--what-you-need-to-provide)
+9. [Session Rules](#9-session-rules)
+10. [Multi-Agent Setup](#10-multi-agent-setup)
 
 ---
 
@@ -707,12 +708,97 @@ Follow this sequence. Each phase builds on the last. Do not skip phases.
 
 ## Still TODO
 - [ ] Connecting path animation between regions (world map visual polish)
-- [ ] Drop .ogg music files into `assets/audio/music/` (system is wired, just needs files)
+- [ ] Music files (see Asset Guide below)
 - [ ] Achievement System (milestones + minor rewards)
 
 ---
 
-# 8. SESSION RULES
+# 8. ASSET GUIDE — What You Need to Provide
+
+Everything below is **already wired in the code**. Just drop the files in the right place with the right name and they'll work automatically.
+
+## Music Files (6 needed)
+
+**Directory:** `BulletHeaven/assets/audio/music/`
+
+The music system loads these on startup via `AudioManager._ready()`. It gracefully skips any missing file, so the game won't crash — you just won't hear music until the files exist.
+
+| Filename | Used When | Notes |
+|----------|-----------|-------|
+| `menu_theme.ogg` | Main menu screen | Plays via `AudioManager.play_music("menu")` |
+| `forest_theme.ogg` | Region 1 — Ashwood Forest combat | Crossfades in when entering a forest node |
+| `tundra_theme.ogg` | Region 2 — Frostpeak Tundra combat | Crossfades in when entering a tundra node |
+| `ruins_theme.ogg` | Region 3 — Emberveil Ruins combat | Crossfades in when entering a ruins node |
+| `depths_theme.ogg` | Region 4 — Shadow Depths combat | Crossfades in when entering a depths node |
+| `nexus_theme.ogg` | Region 5 — The Rune Nexus combat | Crossfades in when entering a nexus node |
+
+**Requirements:**
+- Format: **OGG Vorbis** (`.ogg`) — Godot's preferred format for music
+- Should **loop seamlessly** (Godot will loop by default; set `loop = true` in the import settings)
+- Recommended length: 1-3 minutes each
+- Keep file sizes reasonable for mobile (~1-3 MB each)
+
+**Where to get them:** Free sources like [OpenGameArt.org](https://opengameart.org), [FreeMusicArchive](https://freemusicarchive.org), or AI music generators (Suno, Udio). Search for "fantasy RPG loop", "ice/snow ambient loop", "fire/ruins battle loop", etc.
+
+## SFX Files (4 — Already Exist)
+
+**Directory:** `BulletHeaven/assets/audio/`
+
+These are all present and working. Listed here for reference if you want to replace them with better sounds.
+
+| Filename | Used For | Referenced By |
+|----------|----------|---------------|
+| `shoot.wav` | Player auto-fire | `AudioManager.play_shoot()` |
+| `hit.wav` | Enemy hit by projectile | `AudioManager.play_hit()` |
+| `level_up.wav` | Player level-up | `AudioManager.play_level_up()` |
+| `game_over.wav` | Player death / game over | `AudioManager.play_game_over()` |
+
+**If replacing:** Keep as `.wav` format, short duration (<1 second), mono channel.
+
+## Sprite Files (All Exist — Reference Only)
+
+**Directory:** `BulletHeaven/assets/sprites/`
+
+All sprites are present. Listed here so you know what each one is if you want to create better art.
+
+| Filename | What It Is | Format Details |
+|----------|-----------|----------------|
+| `Gemini_Generated_Image_9luxps9luxps9lux.png` | **Player sprite sheet** | 6 columns × 15 rows, 64px per frame. Rows map to AnimState: 0=IDLE, 1=RUN, 2=SHOOT, 3=BOOST (10 frames per row) |
+| `idle-bobbing-animati.png` | **Enemy idle sprite sheet** | 6 columns × 6 rows, used by all region enemies for idle state |
+| `slime-moving-forward.png` | **Enemy move sprite sheet** | 6 columns × 6 rows, used by all region enemies for walking state |
+| `slime-death-animatio.png` | **Enemy death sprite sheet** | 6 columns × 6 rows, used by all region enemies for death animation |
+| `sprite_sheet_front_6col_15row_64px.png` | **Generic enemy/boss sheet** | 6 columns × 15 rows, 64px. Used by base Enemy.tscn and BossEnemy.tscn |
+| `projectile.png` | **Player bullet** | Single sprite |
+| `xp_gem.png` | **XP gem pickup** | Single sprite |
+| `bg_stars.png` | **Parallax background** | Tiling texture for Main.tscn starfield |
+
+**Tint system:** Enemy variants (Frost, Ember, Shade, Rune) all use the same base sprite sheets but apply color modulation in code — you don't need separate art per region.
+
+## Complete Directory Structure
+
+```
+BulletHeaven/
+├── assets/
+│   ├── audio/
+│   │   ├── shoot.wav              ✅ exists
+│   │   ├── hit.wav                ✅ exists
+│   │   ├── level_up.wav           ✅ exists
+│   │   ├── game_over.wav          ✅ exists
+│   │   └── music/
+│   │       ├── menu_theme.ogg     ❌ NEEDED
+│   │       ├── forest_theme.ogg   ❌ NEEDED
+│   │       ├── tundra_theme.ogg   ❌ NEEDED
+│   │       ├── ruins_theme.ogg    ❌ NEEDED
+│   │       ├── depths_theme.ogg   ❌ NEEDED
+│   │       └── nexus_theme.ogg    ❌ NEEDED
+│   └── sprites/
+│       ├── (all sprite files)     ✅ all exist
+│       └── ...
+```
+
+---
+
+# 9. SESSION RULES
 
 ## Golden Rules
 
@@ -757,7 +843,7 @@ git checkout .    # undo ALL changes since last commit
 
 ---
 
-# 9. MULTI-AGENT SETUP
+# 10. MULTI-AGENT SETUP
 
 Run multiple Claude Code terminals simultaneously for faster development.
 
