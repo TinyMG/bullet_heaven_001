@@ -43,13 +43,18 @@ func _update_labels() -> void:
 	music_value.text = "%d%%" % int(music_volume * 100)
 
 func _apply_volumes() -> void:
-	# SFX bus (index 0 = Master for now, or a dedicated SFX bus)
-	var sfx_db = linear_to_db(sfx_volume) if sfx_volume > 0.0 else -80.0
-	AudioServer.set_bus_volume_db(0, sfx_db)
-	if sfx_volume <= 0.0:
-		AudioServer.set_bus_mute(0, true)
-	else:
-		AudioServer.set_bus_mute(0, false)
+	# SFX bus
+	var sfx_bus = AudioServer.get_bus_index("SFX")
+	if sfx_bus >= 0:
+		var sfx_db = linear_to_db(sfx_volume) if sfx_volume > 0.0 else -80.0
+		AudioServer.set_bus_volume_db(sfx_bus, sfx_db)
+		AudioServer.set_bus_mute(sfx_bus, sfx_volume <= 0.0)
+	# Music bus
+	var music_bus = AudioServer.get_bus_index("Music")
+	if music_bus >= 0:
+		var music_db = linear_to_db(music_volume) if music_volume > 0.0 else -80.0
+		AudioServer.set_bus_volume_db(music_bus, music_db)
+		AudioServer.set_bus_mute(music_bus, music_volume <= 0.0)
 
 func _on_close_pressed() -> void:
 	_save_settings()

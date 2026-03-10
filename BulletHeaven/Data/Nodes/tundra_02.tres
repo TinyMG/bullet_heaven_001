@@ -16,5 +16,7 @@ boss_on_final_wave = true
 difficulty_modifier = 1.4
 unlock_requires = Array[String](["tundra_01"])
 region = "tundra"
+enemy_scene_path = "res://Entities/Enemy/FrostEnemy.tscn"
+boss_scene_path = "res://Entities/Enemy/BossFrost.tscn"
 enemy_loot_table = Array[Dictionary]([{"item_id": "frost_wisp", "drop_chance": 0.35}, {"item_id": "frozen_claw", "drop_chance": 0.3}])
 boss_loot_table = Array[Dictionary]([{"item_id": "frozen_claw", "drop_chance": 1.0}, {"item_id": "frost_wisp", "drop_chance": 0.6}])

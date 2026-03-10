@@ -33,6 +33,7 @@ func _ready() -> void:
 		camera.add_child(shake_node)
 
 	_apply_region_tint()
+	_start_region_music()
 
 func _apply_region_tint() -> void:
 	var node_data = ProgressManager.current_node
@@ -50,4 +51,11 @@ func _apply_region_tint() -> void:
 	tint_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	bg_layer.add_child(tint_rect)
 	add_child(bg_layer)
+
+func _start_region_music() -> void:
+	var node_data = ProgressManager.current_node
+	if node_data:
+		AudioManager.crossfade_music(node_data.region)
+	else:
+		AudioManager.play_music("forest")
 

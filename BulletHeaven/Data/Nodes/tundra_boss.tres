@@ -17,5 +17,7 @@ difficulty_modifier = 1.6
 unlock_requires = Array[String](["tundra_02"])
 rune_required = "tundra_rune"
 region = "tundra"
+enemy_scene_path = "res://Entities/Enemy/FrostEnemy.tscn"
+boss_scene_path = "res://Entities/Enemy/BossFrost.tscn"
 enemy_loot_table = Array[Dictionary]([{"item_id": "frost_wisp", "drop_chance": 0.3}, {"item_id": "frozen_claw", "drop_chance": 0.25}])
 boss_loot_table = Array[Dictionary]([{"item_id": "yeti_heart", "drop_chance": 1.0}, {"item_id": "frozen_claw", "drop_chance": 1.0}])

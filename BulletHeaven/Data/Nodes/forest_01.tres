@@ -17,5 +17,6 @@ difficulty_modifier = 1.0
 unlock_requires = Array[String]([])
 region = "forest"
 enemy_scene_path = "res://Entities/Enemy/SlimeEnemy.tscn"
+boss_scene_path = "res://Entities/Enemy/BossSlime.tscn"
 enemy_loot_table = Array[Dictionary]([{"item_id": "wood_shard", "drop_chance": 0.4}, {"item_id": "dark_petal", "drop_chance": 0.2}])
 boss_loot_table = Array[Dictionary]([{"item_id": "wood_shard", "drop_chance": 1.0}, {"item_id": "dark_petal", "drop_chance": 0.8}])

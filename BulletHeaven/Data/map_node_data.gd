@@ -15,6 +15,7 @@ extends Resource
 @export var rune_required: String = ""  # item_id of rune needed to unlock this node
 @export var region: String = "default"
 @export var enemy_scene_path: String = ""  # Custom enemy scene (e.g. "res://Entities/Enemy/SlimeEnemy.tscn")
+@export var boss_scene_path: String = ""  # Custom boss scene (e.g. "res://Entities/Enemy/BossSlime.tscn")
 
 # Loot table: array of { "item_id": String, "drop_chance": float (0.0-1.0) }
 # Regular enemies roll from this table on death

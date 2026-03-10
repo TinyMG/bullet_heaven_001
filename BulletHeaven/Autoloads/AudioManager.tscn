@@ -14,16 +14,24 @@ script = ExtResource("1_script")
 stream = ExtResource("2_shoot")
 volume_db = -8.0
 max_polyphony = 8
+bus = &"SFX"
 
 [node name="HitPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("3_hit")
 volume_db = -4.0
 max_polyphony = 5
+bus = &"SFX"
 
 [node name="LevelUpPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("4_lvlup")
 volume_db = 0.0
+bus = &"SFX"
 
 [node name="GameOverPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("5_gameover")
 volume_db = 0.0
+bus = &"SFX"
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
+volume_db = 0.0
+bus = &"Music"

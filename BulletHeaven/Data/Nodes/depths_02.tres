@@ -16,5 +16,7 @@ boss_on_final_wave = true
 difficulty_modifier = 1.9
 unlock_requires = Array[String](["depths_01"])
 region = "depths"
+enemy_scene_path = "res://Entities/Enemy/ShadeEnemy.tscn"
+boss_scene_path = "res://Entities/Enemy/BossShade.tscn"
 enemy_loot_table = Array[Dictionary]([{"item_id": "void_essence", "drop_chance": 0.35}, {"item_id": "shadow_silk", "drop_chance": 0.3}])
 boss_loot_table = Array[Dictionary]([{"item_id": "shadow_silk", "drop_chance": 1.0}, {"item_id": "void_essence", "drop_chance": 0.6}])

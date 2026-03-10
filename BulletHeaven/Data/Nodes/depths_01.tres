@@ -17,5 +17,7 @@ difficulty_modifier = 1.7
 unlock_requires = Array[String](["ruins_boss"])
 rune_required = "rune_of_embers"
 region = "depths"
+enemy_scene_path = "res://Entities/Enemy/ShadeEnemy.tscn"
+boss_scene_path = "res://Entities/Enemy/BossShade.tscn"
 enemy_loot_table = Array[Dictionary]([{"item_id": "void_essence", "drop_chance": 0.4}, {"item_id": "shadow_silk", "drop_chance": 0.2}])
 boss_loot_table = Array[Dictionary]([{"item_id": "void_essence", "drop_chance": 1.0}, {"item_id": "shadow_silk", "drop_chance": 0.8}])

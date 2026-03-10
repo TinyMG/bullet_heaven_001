@@ -7,6 +7,7 @@ extends CharacterBody2D
 @export var max_hp: float = 20.0
 @export var contact_damage: float = 10.0
 @export var is_boss: bool = false
+@export var base_modulate: Color = Color.WHITE
 
 # Multi-sheet animation (optional — if set, overrides single sprite sheet)
 @export var idle_texture: Texture2D = null
@@ -55,7 +56,7 @@ func activate() -> void:
 	current_hp = max_hp
 	visible = true
 	set_physics_process(true)
-	sprite.modulate = Color.WHITE
+	sprite.modulate = base_modulate
 	# Re-add to groups (removed on release for pool)
 	if not is_in_group("Enemy"):
 		add_to_group("Enemy")
@@ -118,7 +119,7 @@ func take_damage(amount: float) -> void:
 	# Flash effect
 	sprite.modulate = Color.RED
 	var tween = create_tween()
-	tween.tween_property(sprite, "modulate", Color.WHITE, 0.1)
+	tween.tween_property(sprite, "modulate", base_modulate, 0.1)
 
 	# Update overhead HP bar
 	if is_boss and _boss_hp_bar:
@@ -326,7 +327,7 @@ func _on_phase_change(phase: int) -> void:
 	var phase_color = [Color.WHITE, Color.YELLOW, Color.ORANGE, Color.RED][phase]
 	sprite.modulate = phase_color
 	var tween = create_tween()
-	tween.tween_property(sprite, "modulate", Color.WHITE, 0.4)
+	tween.tween_property(sprite, "modulate", base_modulate, 0.4)
 
 	# Update phase label
 	if _boss_phase_label:

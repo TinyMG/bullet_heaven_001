@@ -17,5 +17,7 @@ difficulty_modifier = 1.4
 unlock_requires = Array[String](["tundra_boss"])
 rune_required = "rune_of_the_glacier"
 region = "ruins"
+enemy_scene_path = "res://Entities/Enemy/EmberEnemy.tscn"
+boss_scene_path = "res://Entities/Enemy/BossEmber.tscn"
 enemy_loot_table = Array[Dictionary]([{"item_id": "ember_core", "drop_chance": 0.4}, {"item_id": "molten_shard", "drop_chance": 0.2}])
 boss_loot_table = Array[Dictionary]([{"item_id": "ember_core", "drop_chance": 1.0}, {"item_id": "molten_shard", "drop_chance": 0.8}])

@@ -37,6 +37,10 @@ func _ready() -> void:
 		var custom_path: String = node_data.get("enemy_scene_path")
 		if custom_path != null and custom_path != "":
 			enemy_scene = load(custom_path)
+		# Use custom boss scene if configured
+		var custom_boss_path: String = node_data.get("boss_scene_path")
+		if custom_boss_path != null and custom_boss_path != "":
+			boss_scene = load(custom_boss_path)
 
 	# Apply node modifiers
 	_apply_modifiers()
