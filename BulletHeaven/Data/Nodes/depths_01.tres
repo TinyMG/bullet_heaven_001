@@ -19,5 +19,5 @@ rune_required = "rune_of_embers"
 region = "depths"
 enemy_scene_path = "res://Entities/Enemy/ShadeEnemy.tscn"
 boss_scene_path = "res://Entities/Enemy/BossShade.tscn"
-enemy_loot_table = Array[Dictionary]([{"item_id": "void_essence", "drop_chance": 0.4}, {"item_id": "shadow_silk", "drop_chance": 0.2}])
+enemy_loot_table = Array[Dictionary]([{"item_id": "void_essence", "drop_chance": 0.4}, {"item_id": "shadow_silk", "drop_chance": 0.2}, {"item_id": "void_scythe", "drop_chance": 0.01}])
 boss_loot_table = Array[Dictionary]([{"item_id": "void_essence", "drop_chance": 1.0}, {"item_id": "shadow_silk", "drop_chance": 0.8}])

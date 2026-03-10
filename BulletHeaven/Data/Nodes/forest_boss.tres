@@ -19,5 +19,5 @@ rune_required = "forest_rune"
 region = "forest"
 enemy_scene_path = "res://Entities/Enemy/SlimeEnemy.tscn"
 boss_scene_path = "res://Entities/Enemy/BossSlime.tscn"
-enemy_loot_table = Array[Dictionary]([{"item_id": "wood_shard", "drop_chance": 0.3}, {"item_id": "dark_petal", "drop_chance": 0.25}, {"item_id": "beast_fang", "drop_chance": 0.2}, {"item_id": "ancient_bark", "drop_chance": 0.1}])
+enemy_loot_table = Array[Dictionary]([{"item_id": "wood_shard", "drop_chance": 0.3}, {"item_id": "dark_petal", "drop_chance": 0.25}, {"item_id": "beast_fang", "drop_chance": 0.2}, {"item_id": "ancient_bark", "drop_chance": 0.1}, {"item_id": "iron_fang_blade", "drop_chance": 0.03}])
 boss_loot_table = Array[Dictionary]([{"item_id": "hollow_core", "drop_chance": 1.0}, {"item_id": "ancient_bark", "drop_chance": 1.0}, {"item_id": "iron_fang_blade", "drop_chance": 0.25}])

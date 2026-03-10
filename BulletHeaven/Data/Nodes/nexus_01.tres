@@ -19,5 +19,5 @@ rune_required = "rune_of_shadows"
 region = "nexus"
 enemy_scene_path = "res://Entities/Enemy/RuneEnemy.tscn"
 boss_scene_path = "res://Entities/Enemy/BossNexus.tscn"
-enemy_loot_table = Array[Dictionary]([{"item_id": "rune_fragment", "drop_chance": 0.35}, {"item_id": "void_essence", "drop_chance": 0.2}, {"item_id": "ember_core", "drop_chance": 0.2}])
+enemy_loot_table = Array[Dictionary]([{"item_id": "rune_fragment", "drop_chance": 0.35}, {"item_id": "void_essence", "drop_chance": 0.2}, {"item_id": "ember_core", "drop_chance": 0.2}, {"item_id": "nexus_cannon", "drop_chance": 0.01}])
 boss_loot_table = Array[Dictionary]([{"item_id": "rune_fragment", "drop_chance": 1.0}, {"item_id": "rune_fragment", "drop_chance": 0.8}])
