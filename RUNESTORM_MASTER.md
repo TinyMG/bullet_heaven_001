@@ -601,37 +601,114 @@ Follow this sequence. Each phase builds on the last. Do not skip phases.
 
 ---
 
-# 7. TRANSITION GUIDE
+# 7. IMPLEMENTATION STATUS
 
-## What's Already Built (from Antigravity audit)
+> Last updated: 2026-03-10
 
-- ✅ Player movement & auto-attack
-- ✅ Wave-based enemy spawner
-- ✅ Enemy AI & boss variant
-- ✅ HP system (player + enemies)
-- ✅ XP & level up with upgrade cards (8 skills)
-- ✅ Screen shake, damage numbers, parallax background
-- ✅ Audio system (AudioManager autoload)
-- ✅ Game state management (GameManager autoload)
-- ✅ Skills management (SkillsManager autoload)
-- ✅ Main menu → Gameplay → Game Over flow
+## Completed Systems
 
-## What's Missing (needs to be built)
+### Phase 0 — Bug Fixes ✅
+- ✅ Fix EnemyDeathEffect particle material
+- ✅ Fix boss death — bonus score (50pts), bigger death effect, screen flash
+- ✅ Fix Quit button → returns to WorldMap instead of quitting app
+- ✅ Remove dead code in projectile.gd
 
-- ❌ Monster drop / loot tables
-- ❌ Inventory system
-- ❌ World map
-- ❌ Node system with Runes
-- ❌ Crafting system
-- ❌ Save system
-- ❌ Mobile touch controls
+### Phase 1 — Combat Core ✅
+- ✅ ObjectPool autoload (bullets, enemies, XP gems, loot drops)
+- ✅ Wave spawner with per-node config, scaling HP/speed
+- ✅ "Wave X" text + "BOSS INCOMING!" pulse + "WAVES CLEARED!" slide-in
+- ✅ XP gems, level-up with 3 random upgrades, 8 skills
+- ✅ HUD: level, XP bar
 
-## Known Bugs to Fix First
+### Phase 2 — Monster Drops & Inventory ✅
+- ✅ Loot tables per node, all 5 regions configured
+- ✅ LootDrop magnetize + auto-collect + "+Item Name" float text
+- ✅ Inventory persists via save_data.json, not lost on death
+- ✅ Drops collected summary on WaveCompletePanel and GameOverPanel
 
-1. EnemyDeathEffect.tscn — malformed, never spawned
-2. Boss death — no fanfare, no bonus score
-3. Quit button — exits app instead of returning to MainMenu
-4. Dead code — unused area_entered in projectile.gd
+### Phase 3 — Crafting System ✅
+- ✅ RecipeDatabase: 20 recipes (5 region runes, 5 node runes, 5 weapons, 5 armor)
+- ✅ CraftingPanel: scrollable list, green/red ingredient counts, craft button
+- ✅ Crafting success glow with "Crafted [item]!" flash
+- ✅ Auto-save after crafting
+
+### Phase 4 — World Map ✅
+- ✅ WorldMap.tscn with 15 nodes across 5 regions
+- ✅ Connection lines, camera scroll, MapNodeButton (locked/unlocked/completed)
+- ✅ Node info panel: name, description, waves, difficulty, rune requirement, drop hints
+- ✅ Node unlock golden pulse glow ("NEW" label on available nodes)
+- ✅ Inventory, Crafting, Equipment buttons on map
+- ✅ Region dimming/brightening on unlock (animated brighten + region-colored connection lines)
+- ✅ Detailed node preview screen (full-screen pre-combat panel with drops, equipment, modifiers)
+
+### Phase 5 — Boss & Region Unlock ✅
+- ✅ BossEnemy: scaled size, 200 HP, 3-phase system (75%/50%/25%), overhead HP bar
+- ✅ Boss death: screen flash, bigger particles, screen shake
+- ✅ "NEW REGION UNLOCKED" announcement panel
+- ✅ Region unlock tracking + rune key items (forest→tundra→ruins→depths→nexus)
+
+### Phase 6 — Save System ✅
+- ✅ save_game/load_game/delete_save/reset via ProgressManager
+- ✅ Persists: completed_nodes, inventory, unlocked_regions, equipped_weapon, equipped_armor
+- ✅ Auto-save after crafting and equipping
+- ✅ Settings saved to user://settings.json (SFX volume)
+- ✅ Audio bus layout (Master → SFX + Music buses)
+- ✅ Music playback system (AudioManager.play_music/crossfade_music)
+- ✅ SFX/Music volume sliders wired to separate buses
+
+### Phase 7 — Mobile Polish ✅
+- ✅ Virtual joystick (left side) + Boost button (bottom-right)
+- ✅ Player uses Input actions (keyboard + touch compatible)
+- ✅ Pinch-to-zoom on world map + single-finger drag scroll
+
+### Phase 8 — UI & Feel Polish ✅
+- ✅ Screen shake, damage numbers, level-up burst particles
+- ✅ Drop pickup float text, crafting glow, node unlock glow
+- ✅ Combat minimap (upper-right, player green, enemies red)
+- ✅ Region-themed combat backgrounds (color tint per region)
+
+### Phase 9 — Custom Enemies ✅
+- ✅ SlimeEnemy with 3-state sprites (idle/move/death) for forest nodes
+- ✅ Multi-sheet animation system in enemy.gd (idle_texture/move_texture/death_texture)
+- ✅ Per-node enemy_scene_path in MapNodeData
+- ✅ Tundra enemy (FrostEnemy — ice-blue tint, slower/tankier, frost trails)
+- ✅ Ruins enemy (EmberEnemy — fiery orange tint, fast/aggressive, dash charge)
+- ✅ Depths enemy (ShadeEnemy — purple tint, durable, teleport blink)
+- ✅ Nexus enemy (RuneEnemy — golden tint, powerful all-around, fires projectiles)
+- ✅ Region-specific boss scenes (BossSlime/BossFrost/BossEmber/BossShade/BossNexus)
+- ✅ boss_scene_path support in MapNodeData + wave_manager.gd
+- ✅ EnemyProjectile system (red-tinted projectiles, pool-compatible)
+
+### Phase 10 — Weapon Variety ✅
+- ✅ weapon_type field on all weapons in ItemDatabase
+- ✅ Player _fire_at() dispatches by weapon type (standard/spread/piercing/homing/aoe)
+- ✅ HomingProjectile (curves toward nearest enemy)
+- ✅ AoEProjectile (explodes on hit, damages enemies in radius)
+- ✅ Spread: wider angle, +2 bolts, shorter range, less damage per bolt
+- ✅ Piercing: infinite pierce-through
+
+### Phase 11 — Ambient Particles ✅
+- ✅ Region-specific ambient particles in combat (forest leaves, tundra snow, ruins embers, depths wisps, nexus sparks)
+
+### Phase 12 — Balance Pass ✅
+- ✅ Boss scale fixed (0.35x for slime-based bosses)
+- ✅ Enemy speeds balanced per region
+- ✅ Contact damage reduced across all region enemies
+- ✅ Boss weapon drops (25%→10% scaling by region)
+- ✅ Rare weapon drops on regular enemies (1-3% per kill)
+
+### Performance Audit ✅
+- ✅ Pooled DamageNumber, FrostTrail, DeathEffect
+- ✅ Cached minimap groups, HUD refs, player stats
+- ✅ Preloaded music resources
+
+### Rune Collection Gallery ✅
+- ✅ Full-screen gallery with locked/crafted/used states, recipe hints, region grouping
+
+## Still TODO
+- [ ] Connecting path animation between regions (world map visual polish)
+- [ ] Drop .ogg music files into `assets/audio/music/` (system is wired, just needs files)
+- [ ] Achievement System (milestones + minor rewards)
 
 ---
 
