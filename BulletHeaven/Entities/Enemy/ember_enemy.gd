@@ -7,7 +7,7 @@ var dash_timer: float = 0.0
 var is_dashing: bool = false
 var dash_duration: float = 0.3
 var dash_elapsed: float = 0.0
-var dash_speed: float = 400.0
+var dash_speed: float = 280.0
 var dash_direction: Vector2 = Vector2.ZERO
 var _wind_up: bool = false
 

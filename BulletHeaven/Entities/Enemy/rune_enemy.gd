@@ -5,7 +5,7 @@ extends "res://Entities/Enemy/enemy.gd"
 var enemy_projectile_scene: PackedScene = preload("res://Entities/Projectile/EnemyProjectile.tscn")
 var shoot_cooldown: float = 2.5
 var shoot_timer: float = 0.0
-var projectile_damage: float = 8.0
+var projectile_damage: float = 5.0
 
 func activate() -> void:
 	super.activate()

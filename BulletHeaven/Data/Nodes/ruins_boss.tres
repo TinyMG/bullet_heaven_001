@@ -20,4 +20,4 @@ region = "ruins"
 enemy_scene_path = "res://Entities/Enemy/EmberEnemy.tscn"
 boss_scene_path = "res://Entities/Enemy/BossEmber.tscn"
 enemy_loot_table = Array[Dictionary]([{"item_id": "ember_core", "drop_chance": 0.3}, {"item_id": "molten_shard", "drop_chance": 0.25}])
-boss_loot_table = Array[Dictionary]([{"item_id": "magma_crystal", "drop_chance": 1.0}, {"item_id": "molten_shard", "drop_chance": 1.0}])
+boss_loot_table = Array[Dictionary]([{"item_id": "magma_crystal", "drop_chance": 1.0}, {"item_id": "molten_shard", "drop_chance": 1.0}, {"item_id": "ember_blade", "drop_chance": 0.15}])
