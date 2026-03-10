@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Entities/Effects/frost_trail.gd" id="1_script"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_trail"]
+radius = 20.0
+
+[node name="FrostTrail" type="Area2D"]
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("1_script")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+modulate = Color(0.5, 0.8, 1.0, 0.4)
+scale = Vector2(3, 3)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_trail")

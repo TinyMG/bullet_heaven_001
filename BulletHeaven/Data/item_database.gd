@@ -133,14 +133,16 @@ var items: Dictionary = {
 		"rarity": "uncommon",
 		"icon_color": Color(0.7, 0.7, 0.7),
 		"stats": {"damage": 8.0, "fire_rate": 0.05},
+		"weapon_type": "standard",
 	},
 	"frost_bow": {
 		"display_name": "Frost Bow",
-		"description": "A bow infused with tundra ice. Chills on impact.",
+		"description": "A bow that fires a wide spread of icy bolts.",
 		"type": "weapon",
 		"rarity": "rare",
 		"icon_color": Color(0.5, 0.8, 1.0),
 		"stats": {"damage": 12.0, "projectile_count": 1},
+		"weapon_type": "spread",
 	},
 	# Armor
 	"slime_shield": {
@@ -161,11 +163,12 @@ var items: Dictionary = {
 	},
 	"ember_blade": {
 		"display_name": "Ember Blade",
-		"description": "A sword wreathed in flame. Burns through enemies.",
+		"description": "A sword wreathed in flame. Projectiles seek out enemies.",
 		"type": "weapon",
 		"rarity": "rare",
 		"icon_color": Color(1.0, 0.4, 0.1),
 		"stats": {"damage": 18.0, "fire_rate": 0.08},
+		"weapon_type": "homing",
 	},
 	"magma_plate": {
 		"display_name": "Magma Plate",
@@ -177,11 +180,12 @@ var items: Dictionary = {
 	},
 	"void_scythe": {
 		"display_name": "Void Scythe",
-		"description": "A blade forged from pure darkness. Cuts through anything.",
+		"description": "A blade forged from pure darkness. Cuts through all enemies.",
 		"type": "weapon",
 		"rarity": "epic",
 		"icon_color": Color(0.4, 0.0, 0.7),
 		"stats": {"damage": 25.0, "projectile_pierce": 2},
+		"weapon_type": "piercing",
 	},
 	"void_mantle": {
 		"display_name": "Void Mantle",
@@ -193,11 +197,12 @@ var items: Dictionary = {
 	},
 	"nexus_cannon": {
 		"display_name": "Nexus Cannon",
-		"description": "The ultimate weapon. Channels raw runic energy.",
+		"description": "The ultimate weapon. Projectiles explode on impact.",
 		"type": "weapon",
 		"rarity": "epic",
 		"icon_color": Color(1.0, 0.9, 0.2),
 		"stats": {"damage": 30.0, "projectile_count": 2, "fire_rate": 0.1},
+		"weapon_type": "aoe",
 	},
 	"nexus_aegis": {
 		"display_name": "Nexus Aegis",

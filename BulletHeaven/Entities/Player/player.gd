@@ -15,6 +15,8 @@ extends CharacterBody2D
 @onready var hurtbox: Area2D = $Hurtbox
 
 var projectile_scene: PackedScene = preload("res://Entities/Projectile/Projectile.tscn")
+var homing_projectile_scene: PackedScene = preload("res://Entities/Projectile/HomingProjectile.tscn")
+var aoe_projectile_scene: PackedScene = preload("res://Entities/Projectile/AoEProjectile.tscn")
 
 var max_hp: float = 100.0
 var current_hp: float = 100.0
@@ -37,6 +39,10 @@ var invincibility_duration: float = 1.0
 var blink_tween: Tween = null
 var contact_damage_cooldown: float = 0.0
 var contact_damage_interval: float = 0.5  # seconds between contact damage ticks
+
+# Slow debuff (from frost trails)
+var slow_stack_count: int = 0
+var speed_modifier: float = 1.0
 
 func _ready() -> void:
 	GameManager.player = self
@@ -66,7 +72,7 @@ func _physics_process(delta: float) -> void:
 	if is_boosting:
 		speed *= 1.5
 		
-	velocity = input_vector * speed
+	velocity = input_vector * speed * speed_modifier
 	move_and_slide()
 	
 	# Determine state
@@ -140,33 +146,119 @@ func _find_nearest_enemy() -> Node2D:
 			closest_dist = dist
 	return closest
 
+func _get_weapon_type() -> String:
+	if ProgressManager.equipped_weapon == "":
+		return "standard"
+	var data = ItemDatabase.get_item(ProgressManager.equipped_weapon)
+	return data.get("weapon_type", "standard")
+
 func _fire_at(target: Node2D) -> void:
+	var weapon_type = _get_weapon_type()
+	match weapon_type:
+		"spread": _fire_spread(target)
+		"piercing": _fire_piercing(target)
+		"homing": _fire_homing(target)
+		"aoe": _fire_aoe(target)
+		_: _fire_standard(target)
+	AudioManager.play_shoot()
+	shoot_anim_timer = 0.2
+
+func _get_damage() -> float:
+	return base_damage + SkillsManager.get_skill_value("damage") + ProgressManager.get_equipment_stat("damage")
+
+func _get_pierce() -> int:
+	return int(SkillsManager.get_skill_value("projectile_pierce") + ProgressManager.get_equipment_stat("projectile_pierce"))
+
+func _get_projectile_count() -> int:
+	return 1 + int(SkillsManager.get_skill_value("projectile_count") + ProgressManager.get_equipment_stat("projectile_count"))
+
+func _fire_standard(target: Node2D) -> void:
 	var base_direction = (target.global_position - muzzle.global_position).normalized()
-	var extra_projectiles = int(SkillsManager.get_skill_value("projectile_count") + ProgressManager.get_equipment_stat("projectile_count"))
-	var total = 1 + extra_projectiles
-	var spread_angle = deg_to_rad(10.0)  # 10 degrees between each extra projectile
-	
+	var total = _get_projectile_count()
+	var spread_angle = deg_to_rad(10.0)
 	for i in range(total):
 		var proj = ObjectPool.get_instance(projectile_scene)
 		proj.global_position = muzzle.global_position
-
-		# Calculate spread offset
 		var offset_angle = 0.0
 		if total > 1:
 			offset_angle = (i - (total - 1) / 2.0) * spread_angle
-		var direction = base_direction.rotated(offset_angle)
-
-		proj.direction = direction
-		proj.damage = base_damage + SkillsManager.get_skill_value("damage") + ProgressManager.get_equipment_stat("damage")
-		proj.pierce_count = int(SkillsManager.get_skill_value("projectile_pierce") + ProgressManager.get_equipment_stat("projectile_pierce"))
+		proj.direction = base_direction.rotated(offset_angle)
+		proj.damage = _get_damage()
+		proj.pierce_count = _get_pierce()
 		if not proj.is_inside_tree():
 			get_tree().current_scene.add_child(proj)
 		else:
 			proj.activate()
-	
-	AudioManager.play_shoot()
-	
-	shoot_anim_timer = 0.2
+
+func _fire_spread(target: Node2D) -> void:
+	var base_direction = (target.global_position - muzzle.global_position).normalized()
+	var total = _get_projectile_count() + 2  # Extra projectiles for spread
+	var spread_angle = deg_to_rad(25.0)  # Wider spread
+	for i in range(total):
+		var proj = ObjectPool.get_instance(projectile_scene)
+		proj.global_position = muzzle.global_position
+		var offset_angle = (i - (total - 1) / 2.0) * spread_angle
+		proj.direction = base_direction.rotated(offset_angle)
+		proj.damage = _get_damage() * 0.7  # Less damage per bolt
+		proj.pierce_count = _get_pierce()
+		proj.lifetime = 1.5  # Shorter range
+		if not proj.is_inside_tree():
+			get_tree().current_scene.add_child(proj)
+		else:
+			proj.activate()
+
+func _fire_piercing(target: Node2D) -> void:
+	var base_direction = (target.global_position - muzzle.global_position).normalized()
+	var total = _get_projectile_count()
+	var spread_angle = deg_to_rad(10.0)
+	for i in range(total):
+		var proj = ObjectPool.get_instance(projectile_scene)
+		proj.global_position = muzzle.global_position
+		var offset_angle = 0.0
+		if total > 1:
+			offset_angle = (i - (total - 1) / 2.0) * spread_angle
+		proj.direction = base_direction.rotated(offset_angle)
+		proj.damage = _get_damage()
+		proj.pierce_count = 9999  # Infinite pierce
+		if not proj.is_inside_tree():
+			get_tree().current_scene.add_child(proj)
+		else:
+			proj.activate()
+
+func _fire_homing(target: Node2D) -> void:
+	var base_direction = (target.global_position - muzzle.global_position).normalized()
+	var total = _get_projectile_count()
+	var spread_angle = deg_to_rad(15.0)
+	for i in range(total):
+		var proj = ObjectPool.get_instance(homing_projectile_scene)
+		proj.global_position = muzzle.global_position
+		var offset_angle = 0.0
+		if total > 1:
+			offset_angle = (i - (total - 1) / 2.0) * spread_angle
+		proj.direction = base_direction.rotated(offset_angle)
+		proj.damage = _get_damage()
+		proj.pierce_count = _get_pierce()
+		if not proj.is_inside_tree():
+			get_tree().current_scene.add_child(proj)
+		else:
+			proj.activate()
+
+func _fire_aoe(target: Node2D) -> void:
+	var base_direction = (target.global_position - muzzle.global_position).normalized()
+	var total = _get_projectile_count()
+	var spread_angle = deg_to_rad(10.0)
+	for i in range(total):
+		var proj = ObjectPool.get_instance(aoe_projectile_scene)
+		proj.global_position = muzzle.global_position
+		var offset_angle = 0.0
+		if total > 1:
+			offset_angle = (i - (total - 1) / 2.0) * spread_angle
+		proj.direction = base_direction.rotated(offset_angle)
+		proj.damage = _get_damage()
+		if not proj.is_inside_tree():
+			get_tree().current_scene.add_child(proj)
+		else:
+			proj.activate()
 
 func _on_skill_upgraded(skill_name: String, _new_rank: int) -> void:
 	match skill_name:
@@ -275,3 +367,11 @@ func _push_enemy(enemy: Node2D) -> void:
 		var push_dir = (enemy.global_position - global_position).normalized()
 		enemy.velocity = push_dir * 200.0
 		enemy.move_and_slide()
+
+func apply_slow() -> void:
+	slow_stack_count += 1
+	speed_modifier = max(0.3, 1.0 - slow_stack_count * 0.15)
+
+func remove_slow() -> void:
+	slow_stack_count = max(0, slow_stack_count - 1)
+	speed_modifier = max(0.3, 1.0 - slow_stack_count * 0.15)
