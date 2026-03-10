@@ -31,6 +31,14 @@ var scroll_offset: float = 0.0
 var scroll_speed: float = 400.0
 var max_scroll: float = 0.0
 
+# Pinch-to-zoom
+var _touch_points: Dictionary = {}  # finger_index → position
+var _initial_pinch_distance: float = 0.0
+var _initial_zoom: float = 1.0
+var zoom_level: float = 1.0
+const ZOOM_MIN: float = 0.6
+const ZOOM_MAX: float = 1.5
+
 var region_names: Dictionary = {
 	"forest": "Ashwood Forest",
 	"tundra": "Frostpeak Tundra",
@@ -38,6 +46,16 @@ var region_names: Dictionary = {
 	"depths": "Shadow Depths",
 	"nexus": "The Rune Nexus",
 }
+
+var region_colors: Dictionary = {
+	"forest": Color(0.3, 0.8, 0.3),
+	"tundra": Color(0.4, 0.6, 1.0),
+	"ruins": Color(1.0, 0.5, 0.2),
+	"depths": Color(0.6, 0.2, 0.8),
+	"nexus": Color(1.0, 0.85, 0.2),
+}
+
+var _node_buttons: Array = []
 
 func _ready() -> void:
 	info_panel.visible = false
@@ -55,25 +73,52 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
 			scroll_offset = min(scroll_offset + 60.0, max_scroll)
-			node_container.position.y = -scroll_offset
-			queue_redraw()
+			_apply_scroll_zoom()
 		elif event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
 			scroll_offset = max(scroll_offset - 60.0, 0.0)
-			node_container.position.y = -scroll_offset
-			queue_redraw()
+			_apply_scroll_zoom()
 	# Arrow key scrolling
 	if event is InputEventKey and event.pressed:
 		if event.keycode == KEY_DOWN:
 			scroll_offset = min(scroll_offset + 60.0, max_scroll)
-			node_container.position.y = -scroll_offset
-			queue_redraw()
+			_apply_scroll_zoom()
 		elif event.keycode == KEY_UP:
 			scroll_offset = max(scroll_offset - 60.0, 0.0)
-			node_container.position.y = -scroll_offset
-			queue_redraw()
+			_apply_scroll_zoom()
+
+	# Pinch-to-zoom (touch)
+	if event is InputEventScreenTouch:
+		if event.pressed:
+			_touch_points[event.index] = event.position
+			if _touch_points.size() == 2:
+				var points = _touch_points.values()
+				_initial_pinch_distance = points[0].distance_to(points[1])
+				_initial_zoom = zoom_level
+		else:
+			_touch_points.erase(event.index)
+
+	if event is InputEventScreenDrag:
+		_touch_points[event.index] = event.position
+		if _touch_points.size() == 2:
+			var points = _touch_points.values()
+			var current_distance = points[0].distance_to(points[1])
+			if _initial_pinch_distance > 10.0:
+				var scale_factor = current_distance / _initial_pinch_distance
+				zoom_level = clamp(_initial_zoom * scale_factor, ZOOM_MIN, ZOOM_MAX)
+				_apply_scroll_zoom()
+		elif _touch_points.size() == 1:
+			# Single finger drag = scroll
+			scroll_offset = clamp(scroll_offset - event.relative.y, 0.0, max_scroll)
+			_apply_scroll_zoom()
+
+func _apply_scroll_zoom() -> void:
+	node_container.position.y = -scroll_offset
+	node_container.scale = Vector2(zoom_level, zoom_level)
+	queue_redraw()
 
 func _build_map() -> void:
 	node_positions.clear()
+	_node_buttons.clear()
 	# Clear existing nodes
 	for child in node_container.get_children():
 		child.queue_free()
@@ -86,6 +131,7 @@ func _build_map() -> void:
 		node_container.add_child(btn)
 		btn.node_selected.connect(_on_node_selected)
 		node_positions.append(data.position_on_map + Vector2(60, 25))
+		_node_buttons.append(btn)
 
 		# Dim nodes from locked regions
 		if not ProgressManager.is_region_unlocked(data.region):
@@ -229,13 +275,32 @@ func _draw() -> void:
 		if conn.x < node_positions.size() and conn.y < node_positions.size():
 			var from = node_positions[conn.x] + offset
 			var to = node_positions[conn.y] + offset
-			draw_line(from, to, Color(0.5, 0.5, 0.6, 0.6), 2.0)
+			# Color lines based on the destination node's region
+			var line_color = Color(0.5, 0.5, 0.6, 0.6)
+			if conn.y < map_config.nodes.size():
+				var dest_data = map_config.nodes[conn.y]
+				if ProgressManager.is_region_unlocked(dest_data.region):
+					var rc = region_colors.get(dest_data.region, Color.WHITE)
+					line_color = Color(rc.r, rc.g, rc.b, 0.5)
+				else:
+					line_color = Color(0.3, 0.3, 0.3, 0.3)
+			draw_line(from, to, line_color, 2.0)
 
 func _on_region_unlocked(region_id: String) -> void:
+	# Animate brightening on the newly unlocked region's nodes before rebuilding
+	_brighten_region_nodes(region_id)
 	# Rebuild the map to show newly unlocked nodes
 	_build_map()
 	# Show unlock announcement
 	_show_region_unlock_panel(region_id)
+
+func _brighten_region_nodes(region_id: String) -> void:
+	for btn in _node_buttons:
+		if btn.node_data and btn.node_data.region == region_id:
+			var tween = btn.create_tween()
+			# Flash bright white then settle to normal
+			tween.tween_property(btn, "modulate", Color(2.0, 2.0, 2.0, 1.0), 0.3)
+			tween.tween_property(btn, "modulate", Color.WHITE, 0.5)
 
 func _show_region_unlock_panel(region_id: String) -> void:
 	var display_name = region_names.get(region_id, region_id)
