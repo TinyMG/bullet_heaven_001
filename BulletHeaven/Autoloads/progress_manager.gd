@@ -67,6 +67,7 @@ var boss_unlock_map: Dictionary = {
 
 func _ready() -> void:
 	load_game()
+	debug_fill_materials()  # DEBUG: Remove after testing!
 
 # --- Map Progress ---
 
@@ -257,3 +258,17 @@ func reset() -> void:
 	equipped_armor = ""
 	current_node = null
 	delete_save()
+
+## DEBUG: Fill all materials to 100 for testing. Remove after testing!
+func debug_fill_materials() -> void:
+	var material_ids = [
+		"wood_shard", "dark_petal", "beast_fang", "ancient_bark", "hollow_core",
+		"frost_wisp", "frozen_claw", "yeti_heart",
+		"ember_core", "molten_shard", "magma_crystal",
+		"void_essence", "shadow_silk", "void_crown",
+		"nexus_shard", "rune_fragment", "nexus_core",
+	]
+	for mat_id in material_ids:
+		inventory[mat_id] = 100
+	save_game()
+	print("DEBUG: All materials set to 100")

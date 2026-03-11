@@ -183,6 +183,9 @@ func _die() -> void:
 
 	GameManager.add_score(50 if is_boss else 10)
 	GameManager.add_kill()
+	# Vampiric heal
+	if GameManager.player and GameManager.player.has_method("on_enemy_killed"):
+		GameManager.player.on_enemy_killed()
 	if is_boss:
 		GameManager.boss_defeated.emit()
 

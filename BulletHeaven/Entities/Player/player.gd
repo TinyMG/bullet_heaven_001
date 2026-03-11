@@ -3,9 +3,9 @@ extends CharacterBody2D
 ## Player.gd
 ## 8-way movement + auto-firing weapon targeting the nearest enemy.
 
-@export var base_speed: float = 200.0
+@export var base_speed: float = 150.0
 @export var base_damage: float = 10.0
-@export var base_fire_rate: float = 0.5  # seconds between shots
+@export var base_fire_rate: float = 0.5  # seconds between shots (fallback)
 
 @onready var fire_timer: Timer = $FireTimer
 @onready var muzzle: Marker2D = $Muzzle
@@ -54,7 +54,6 @@ var slow_stack_count: int = 0
 var speed_modifier: float = 1.0
 
 # Cached stat values (updated on skill upgrade / equip change, not every frame)
-var _cached_move_speed: float = 0.0
 var _cached_hp_regen: float = 0.0
 
 func _ready() -> void:
@@ -64,26 +63,25 @@ func _ready() -> void:
 	fire_timer.start()
 	fire_timer.timeout.connect(_on_fire_timer_timeout)
 	_update_magnet_radius()
-	
+
 	# Connect skill upgrades and level-up effects
 	SkillsManager.skill_upgraded.connect(_on_skill_upgraded)
 	GameManager.player_leveled_up.connect(_on_leveled_up)
-	
+
 	# Connect hurtbox
 	hurtbox.area_entered.connect(_on_hurtbox_area_entered)
 
-	# Listen for equipment changes
-	ProgressManager.equipment_changed.connect(_update_cached_stats)
+	# Listen for PlayerStats changes (covers equipment + level-up stat boosts)
+	PlayerStats.stats_changed.connect(_on_stats_changed)
 
-	# Apply equipment stats at combat start
-	_update_fire_rate()
-	_update_max_hp()
+	# Apply stats at combat start
+	_apply_stats_from_player_stats()
 	_update_cached_stats()
 	current_hp = max_hp
 
 func _physics_process(delta: float) -> void:
 	var input_vector = Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	var speed = base_speed + _cached_move_speed
+	var speed = PlayerStats.final_speed
 	
 	var is_boosting = Input.is_action_pressed("boost")
 	if is_boosting:
@@ -208,7 +206,7 @@ func _fire_at(target: Node2D) -> void:
 	shoot_anim_timer = 0.2
 
 func _get_damage() -> float:
-	return base_damage + SkillsManager.get_skill_value("damage") + ProgressManager.get_equipment_stat("damage")
+	return PlayerStats.final_power
 
 func _get_pierce() -> int:
 	return int(SkillsManager.get_skill_value("projectile_pierce") + ProgressManager.get_equipment_stat("projectile_pierce"))
@@ -304,31 +302,30 @@ func _fire_aoe(target: Node2D) -> void:
 		else:
 			proj.activate()
 
-func _on_skill_upgraded(skill_name: String, _new_rank: int) -> void:
+func _on_skill_upgraded(_skill_name: String, _new_rank: int) -> void:
 	_update_cached_stats()
-	match skill_name:
-		"fire_rate":
-			_update_fire_rate()
-		"pickup_radius":
-			_update_magnet_radius()
-		"max_hp":
-			_update_max_hp()
-			current_hp = min(current_hp + 10.0, max_hp)  # Heal a bit on upgrade
 
-func _update_fire_rate() -> void:
-	var reduction = SkillsManager.get_skill_value("fire_rate") + ProgressManager.get_equipment_stat("fire_rate")
-	fire_timer.wait_time = max(0.1, base_fire_rate - (base_fire_rate * reduction))
+func _on_stats_changed() -> void:
+	_apply_stats_from_player_stats()
 
-func _update_max_hp() -> void:
-	var bonus = SkillsManager.get_skill_value("max_hp") + ProgressManager.get_equipment_stat("max_hp")
-	max_hp = 100.0 + bonus
+func _apply_stats_from_player_stats() -> void:
+	var old_max_hp = max_hp
+	max_hp = PlayerStats.final_vitality
+	# Heal proportionally when max HP increases from a level-up stat boost
+	if max_hp > old_max_hp and old_max_hp > 0.0:
+		current_hp = min(current_hp + (max_hp - old_max_hp), max_hp)
+	# Fire rate: convert attacks-per-second to seconds-between-shots
+	fire_timer.wait_time = maxf(0.1, 1.0 / PlayerStats.final_attack_speed)
 
 func _update_magnet_radius() -> void:
-	var radius = base_magnet_radius + SkillsManager.get_skill_value("pickup_radius")
+	var radius = base_magnet_radius + PlayerStats.magnetic_bonus
 	(magnet_collision.shape as CircleShape2D).radius = radius
 
+func on_enemy_killed() -> void:
+	if PlayerStats.vampiric_active and current_hp < max_hp:
+		current_hp = minf(current_hp + 3.0, max_hp)
+
 func _update_cached_stats() -> void:
-	_cached_move_speed = SkillsManager.get_skill_value("move_speed") + ProgressManager.get_equipment_stat("move_speed")
 	_cached_hp_regen = SkillsManager.get_skill_value("hp_regen") + ProgressManager.get_equipment_stat("hp_regen")
 
 func take_damage(amount: float) -> void:

@@ -7,40 +7,12 @@ signal skill_upgraded(skill_name: String, new_rank: int)
 
 # Each skill: { "description", "max_rank", "current_rank", "effect_per_rank" }
 var skills: Dictionary = {
-	"fire_rate": {
-		"display_name": "Fire Rate",
-		"description": "Increases weapon fire rate.",
-		"max_rank": 5,
-		"current_rank": 0,
-		"effect_per_rank": 0.15  # 15% faster per rank
-	},
-	"damage": {
-		"display_name": "Damage",
-		"description": "Increases projectile damage.",
-		"max_rank": 5,
-		"current_rank": 0,
-		"effect_per_rank": 5.0  # +5 damage per rank
-	},
-	"move_speed": {
-		"display_name": "Move Speed",
-		"description": "Increases player movement speed.",
-		"max_rank": 5,
-		"current_rank": 0,
-		"effect_per_rank": 20.0  # +20 speed per rank
-	},
 	"pickup_radius": {
 		"display_name": "Pickup Radius",
 		"description": "Increases XP gem pickup range.",
 		"max_rank": 5,
 		"current_rank": 0,
 		"effect_per_rank": 15.0  # +15 px radius per rank
-	},
-	"max_hp": {
-		"display_name": "Max HP",
-		"description": "Increases maximum health.",
-		"max_rank": 5,
-		"current_rank": 0,
-		"effect_per_rank": 10.0  # +10 HP per rank
 	},
 	"projectile_count": {
 		"display_name": "Multishot",

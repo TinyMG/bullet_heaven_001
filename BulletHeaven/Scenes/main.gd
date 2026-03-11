@@ -19,6 +19,7 @@ const REGION_TINTS: Dictionary = {
 func _ready() -> void:
 	GameManager.reset()
 	SkillsManager.reset_all()
+	PlayerStats.reset_run_bonuses()
 
 	# Attach camera to player so smoothing works natively without script snapping
 	if player and camera:

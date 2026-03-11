@@ -136,8 +136,185 @@ var recipes: Array[Dictionary] = [
 		"result_id": "void_mantle",
 		"result_count": 1,
 		"ingredients": [
-			{"item_id": "shadow_silk", "count": 6},
+			{"item_id": "void_essence", "count": 6},
 			{"item_id": "void_crown", "count": 3},
+		],
+	},
+	# ── Upgrade Chain: Fang Blade ──
+	{
+		"result_id": "steel_fang_blade",
+		"result_count": 1,
+		"ingredients": [
+			{"item_id": "iron_fang_blade", "count": 1},
+			{"item_id": "frost_wisp", "count": 5},
+			{"item_id": "frozen_claw", "count": 3},
+		],
+	},
+	{
+		"result_id": "runed_fang_blade",
+		"result_count": 1,
+		"ingredients": [
+			{"item_id": "steel_fang_blade", "count": 1},
+			{"item_id": "ember_core", "count": 5},
+			{"item_id": "molten_shard", "count": 3},
+		],
+	},
+	{
+		"result_id": "void_fang_blade",
+		"result_count": 1,
+		"ingredients": [
+			{"item_id": "runed_fang_blade", "count": 1},
+			{"item_id": "void_essence", "count": 5},
+			{"item_id": "shadow_silk", "count": 3},
+		],
+	},
+	{
+		"result_id": "nexus_fang_blade",
+		"result_count": 1,
+		"ingredients": [
+			{"item_id": "void_fang_blade", "count": 1},
+			{"item_id": "nexus_shard", "count": 5},
+			{"item_id": "rune_fragment", "count": 3},
+		],
+	},
+	# ── Upgrade Chain: Bow ──
+	{
+		"result_id": "ember_bow",
+		"result_count": 1,
+		"ingredients": [
+			{"item_id": "frost_bow", "count": 1},
+			{"item_id": "ember_core", "count": 5},
+			{"item_id": "molten_shard", "count": 3},
+		],
+	},
+	{
+		"result_id": "shadow_bow",
+		"result_count": 1,
+		"ingredients": [
+			{"item_id": "ember_bow", "count": 1},
+			{"item_id": "void_essence", "count": 5},
+			{"item_id": "shadow_silk", "count": 3},
+		],
+	},
+	{
+		"result_id": "nexus_bow",
+		"result_count": 1,
+		"ingredients": [
+			{"item_id": "shadow_bow", "count": 1},
+			{"item_id": "nexus_shard", "count": 5},
+			{"item_id": "rune_fragment", "count": 3},
+		],
+	},
+	# ── Upgrade Chain: Staff ──
+	{
+		"result_id": "ember_staff",
+		"result_count": 1,
+		"ingredients": [
+			{"item_id": "ember_core", "count": 8},
+			{"item_id": "molten_shard", "count": 4},
+			{"item_id": "magma_crystal", "count": 1},
+		],
+	},
+	{
+		"result_id": "void_staff",
+		"result_count": 1,
+		"ingredients": [
+			{"item_id": "ember_staff", "count": 1},
+			{"item_id": "void_essence", "count": 5},
+			{"item_id": "shadow_silk", "count": 3},
+		],
+	},
+	{
+		"result_id": "nexus_staff",
+		"result_count": 1,
+		"ingredients": [
+			{"item_id": "void_staff", "count": 1},
+			{"item_id": "nexus_shard", "count": 5},
+			{"item_id": "rune_fragment", "count": 3},
+		],
+	},
+	# ── Upgrade Chain: Spear ──
+	{
+		"result_id": "frost_spear",
+		"result_count": 1,
+		"ingredients": [
+			{"item_id": "frost_wisp", "count": 6},
+			{"item_id": "frozen_claw", "count": 4},
+			{"item_id": "yeti_heart", "count": 2},
+		],
+	},
+	{
+		"result_id": "runed_spear",
+		"result_count": 1,
+		"ingredients": [
+			{"item_id": "frost_spear", "count": 1},
+			{"item_id": "ember_core", "count": 5},
+			{"item_id": "molten_shard", "count": 3},
+		],
+	},
+	{
+		"result_id": "void_spear",
+		"result_count": 1,
+		"ingredients": [
+			{"item_id": "runed_spear", "count": 1},
+			{"item_id": "void_essence", "count": 5},
+			{"item_id": "shadow_silk", "count": 3},
+		],
+	},
+	{
+		"result_id": "nexus_spear",
+		"result_count": 1,
+		"ingredients": [
+			{"item_id": "void_spear", "count": 1},
+			{"item_id": "nexus_shard", "count": 5},
+			{"item_id": "rune_fragment", "count": 3},
+		],
+	},
+	# ── Upgrade Chain: Shield ──
+	{
+		"result_id": "frost_shield",
+		"result_count": 1,
+		"ingredients": [
+			{"item_id": "slime_shield", "count": 1},
+			{"item_id": "frost_wisp", "count": 5},
+			{"item_id": "frozen_claw", "count": 3},
+		],
+	},
+	{
+		"result_id": "ember_shield",
+		"result_count": 1,
+		"ingredients": [
+			{"item_id": "frost_shield", "count": 1},
+			{"item_id": "ember_core", "count": 5},
+			{"item_id": "molten_shard", "count": 3},
+		],
+	},
+	{
+		"result_id": "void_shield",
+		"result_count": 1,
+		"ingredients": [
+			{"item_id": "ember_shield", "count": 1},
+			{"item_id": "void_essence", "count": 5},
+			{"item_id": "shadow_silk", "count": 3},
+		],
+	},
+	{
+		"result_id": "nexus_shield",
+		"result_count": 1,
+		"ingredients": [
+			{"item_id": "void_shield", "count": 1},
+			{"item_id": "nexus_shard", "count": 5},
+			{"item_id": "rune_fragment", "count": 3},
+		],
+	},
+	# ── Upgrade Chain: Mantle ──
+	{
+		"result_id": "nexus_mantle",
+		"result_count": 1,
+		"ingredients": [
+			{"item_id": "void_mantle", "count": 1},
+			{"item_id": "nexus_shard", "count": 5},
+			{"item_id": "rune_fragment", "count": 3},
 		],
 	},
 	# Region 5 — Nexus
