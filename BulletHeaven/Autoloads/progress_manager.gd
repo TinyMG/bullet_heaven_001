@@ -234,17 +234,29 @@ func load_game() -> void:
 		push_error("ProgressManager: Failed to parse save file.")
 		return
 
+	if typeof(json.data) != TYPE_DICTIONARY:
+		push_error("ProgressManager: Save file root is not a Dictionary.")
+		return
+
 	var data: Dictionary = json.data
-	if data.has("completed_nodes"):
+	if data.has("completed_nodes") and typeof(data["completed_nodes"]) == TYPE_ARRAY:
 		completed_nodes = Array(data["completed_nodes"])
-	if data.has("inventory"):
+	if data.has("inventory") and typeof(data["inventory"]) == TYPE_DICTIONARY:
 		inventory = data["inventory"]
-	if data.has("unlocked_regions"):
+	if data.has("unlocked_regions") and typeof(data["unlocked_regions"]) == TYPE_ARRAY:
 		unlocked_regions = Array(data["unlocked_regions"])
 	else:
 		unlocked_regions = ["forest"]
-	equipped_weapon = data.get("equipped_weapon", "")
-	equipped_armor = data.get("equipped_armor", "")
+
+	if data.has("equipped_weapon") and typeof(data["equipped_weapon"]) == TYPE_STRING:
+		equipped_weapon = data["equipped_weapon"]
+	else:
+		equipped_weapon = ""
+
+	if data.has("equipped_armor") and typeof(data["equipped_armor"]) == TYPE_STRING:
+		equipped_armor = data["equipped_armor"]
+	else:
+		equipped_armor = ""
 
 func delete_save() -> void:
 	if FileAccess.file_exists(SAVE_PATH):

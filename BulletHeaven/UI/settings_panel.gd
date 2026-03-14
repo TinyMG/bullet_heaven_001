@@ -81,7 +81,19 @@ func _load_settings() -> void:
 	file.close()
 	if err != OK:
 		return
+	if typeof(json.data) != TYPE_DICTIONARY:
+		return
+
 	var data: Dictionary = json.data
-	sfx_volume = data.get("sfx_volume", 1.0)
-	music_volume = data.get("music_volume", 1.0)
+
+	if data.has("sfx_volume") and (typeof(data["sfx_volume"]) == TYPE_FLOAT or typeof(data["sfx_volume"]) == TYPE_INT):
+		sfx_volume = float(data["sfx_volume"])
+	else:
+		sfx_volume = 1.0
+
+	if data.has("music_volume") and (typeof(data["music_volume"]) == TYPE_FLOAT or typeof(data["music_volume"]) == TYPE_INT):
+		music_volume = float(data["music_volume"])
+	else:
+		music_volume = 1.0
+
 	_apply_volumes()
