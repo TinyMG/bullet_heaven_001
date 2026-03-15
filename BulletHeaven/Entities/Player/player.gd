@@ -56,6 +56,10 @@ var speed_modifier: float = 1.0
 # Cached stat values (updated on skill upgrade / equip change, not every frame)
 var _cached_hp_regen: float = 0.0
 
+var _cached_nearest_enemy: Node2D = null
+var _nearest_enemy_timer: float = 0.0
+const NEAREST_ENEMY_INTERVAL: float = 0.2
+
 func _ready() -> void:
 	GameManager.player = self
 	add_to_group("Player")
@@ -105,11 +109,16 @@ func _physics_process(delta: float) -> void:
 	if velocity.x != 0:
 		sprite.flip_h = velocity.x < 0
 	elif current_anim_state == AnimState.SHOOT:
-		var nearest = _find_nearest_enemy()
-		if nearest and nearest.global_position.x < global_position.x:
-			sprite.flip_h = true
-		elif nearest:
-			sprite.flip_h = false
+		_nearest_enemy_timer -= delta
+		if _nearest_enemy_timer <= 0.0 or not is_instance_valid(_cached_nearest_enemy) or not _cached_nearest_enemy.visible:
+			_cached_nearest_enemy = _find_nearest_enemy()
+			_nearest_enemy_timer = NEAREST_ENEMY_INTERVAL
+
+		if _cached_nearest_enemy and is_instance_valid(_cached_nearest_enemy):
+			if _cached_nearest_enemy.global_position.x < global_position.x:
+				sprite.flip_h = true
+			else:
+				sprite.flip_h = false
 
 	# Get row, frame count, and speed for current state
 	var row: int = 0
@@ -180,12 +189,14 @@ func _on_fire_timer_timeout() -> void:
 func _find_nearest_enemy() -> Node2D:
 	var enemies = get_tree().get_nodes_in_group("Enemy")
 	var closest: Node2D = null
-	var closest_dist: float = 500.0  # Max targeting range
+	var closest_dist_sq: float = 250000.0  # 500.0 * 500.0
 	for enemy in enemies:
-		var dist = global_position.distance_to(enemy.global_position)
-		if dist < closest_dist:
+		if not is_instance_valid(enemy) or not enemy.visible:
+			continue
+		var dist_sq = global_position.distance_squared_to(enemy.global_position)
+		if dist_sq < closest_dist_sq:
 			closest = enemy
-			closest_dist = dist
+			closest_dist_sq = dist_sq
 	return closest
 
 func _get_weapon_type() -> String:

@@ -11,6 +11,10 @@ var turn_speed: float = 3.0
 var _lifetime_timer: float = 0.0
 var _ready_done: bool = false
 
+var _cached_target: Node2D = null
+var _target_update_timer: float = 0.0
+const TARGET_UPDATE_INTERVAL: float = 0.2
+
 func _ready() -> void:
 	if not _ready_done:
 		add_to_group("Projectile")
@@ -24,14 +28,20 @@ func activate() -> void:
 	visible = true
 	set_physics_process(true)
 	_lifetime_timer = lifetime
+	_cached_target = null
+	_target_update_timer = 0.0
 	set_deferred("monitoring", true)
 	set_deferred("monitorable", true)
 
 func _physics_process(delta: float) -> void:
 	# Home toward nearest enemy
-	var nearest = _find_nearest_enemy()
-	if nearest:
-		var desired_dir = (nearest.global_position - global_position).normalized()
+	_target_update_timer -= delta
+	if _target_update_timer <= 0.0 or not is_instance_valid(_cached_target) or not _cached_target.visible:
+		_cached_target = _find_nearest_enemy()
+		_target_update_timer = TARGET_UPDATE_INTERVAL
+
+	if _cached_target and is_instance_valid(_cached_target):
+		var desired_dir = (_cached_target.global_position - global_position).normalized()
 		var angle_diff = direction.angle_to(desired_dir)
 		var max_turn = turn_speed * delta
 		var clamped = clamp(angle_diff, -max_turn, max_turn)
@@ -46,12 +56,14 @@ func _physics_process(delta: float) -> void:
 func _find_nearest_enemy() -> Node2D:
 	var enemies = get_tree().get_nodes_in_group("Enemy")
 	var closest: Node2D = null
-	var closest_dist: float = 400.0
+	var closest_dist_sq: float = 160000.0 # 400.0 * 400.0
 	for enemy in enemies:
-		var dist = global_position.distance_to(enemy.global_position)
-		if dist < closest_dist:
+		if not is_instance_valid(enemy) or not enemy.visible:
+			continue
+		var dist_sq = global_position.distance_squared_to(enemy.global_position)
+		if dist_sq < closest_dist_sq:
 			closest = enemy
-			closest_dist = dist
+			closest_dist_sq = dist_sq
 	return closest
 
 func _on_body_entered(body: Node2D) -> void:
