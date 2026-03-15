@@ -1,0 +1,4 @@
+## 2024-03-15 - [Preventing Insecure Deserialization Crashes in Godot 4]
+**Vulnerability:** Parsing local save files (`JSON.parse()`) and directly assigning `json.data` to a strongly typed variable (e.g., `Dictionary`) without type checking causes a runtime crash if the user modifies the file to contain invalid data types (like an array or string instead of an object).
+**Learning:** In Godot 4, strongly-typed variables will crash the engine runtime when receiving mismatched types from untrusted data sources (such as local `.json` files which players can easily tamper with).
+**Prevention:** Always validate the type of `json.data` using `typeof(json.data) == TYPE_DICTIONARY` (or the expected type) before casting or assigning it to a strongly typed variable.
