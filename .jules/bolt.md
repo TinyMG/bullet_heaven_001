@@ -1,0 +1,3 @@
+## 2026-03-16 - [Optimize Proximity Checks]
+**Learning:** Using `global_position.distance_to()` invokes expensive square root operations, which become a noticeable performance bottleneck in Godot when checking distances in highly recurrent loops like `_physics_process` (such as seeking targets or homing projectiles processing groups of enemies).
+**Action:** Always prefer `global_position.distance_squared_to()` for proximity checks and compare it against the squared threshold distance, avoiding the square root computation altogether.
