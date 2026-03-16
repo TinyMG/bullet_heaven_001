@@ -1,0 +1,4 @@
+## 2024-03-16 - Prevent JSON Parse Crash on Tampered User Files
+**Vulnerability:** A lack of strict type checking after `JSON.parse` allows tampered or malformed user files (e.g., save data, settings) to crash the application by causing type assignment errors (e.g., assigning an array to a Dictionary variable).
+**Learning:** In Godot 4, parsing a valid JSON array string (e.g., `[]`) succeeds without a parse error, but `json.data` returns an `Array`. Without a type check `typeof(json.data) == TYPE_DICTIONARY`, casting `json.data` directly to a `Dictionary` variable causes a runtime crash.
+**Prevention:** Always follow `JSON.parse` checks (`if err != OK:`) with a strict type check `if typeof(json.data) != TYPE_DICTIONARY:` before attempting to cast or assign `json.data` to a Dictionary, returning or logging gracefully on failure.
