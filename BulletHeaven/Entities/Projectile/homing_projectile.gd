@@ -11,6 +11,11 @@ var turn_speed: float = 3.0
 var _lifetime_timer: float = 0.0
 var _ready_done: bool = false
 
+# Caching for targeting optimization
+var _target_enemy: Node2D = null
+var _target_search_timer: float = 0.0
+const TARGET_SEARCH_INTERVAL: float = 0.2
+
 func _ready() -> void:
 	if not _ready_done:
 		add_to_group("Projectile")
@@ -28,10 +33,15 @@ func activate() -> void:
 	set_deferred("monitorable", true)
 
 func _physics_process(delta: float) -> void:
-	# Home toward nearest enemy
-	var nearest = _find_nearest_enemy()
-	if nearest:
-		var desired_dir = (nearest.global_position - global_position).normalized()
+	# Home toward nearest enemy, caching target to avoid querying every frame
+	_target_search_timer -= delta
+
+	if _target_search_timer <= 0.0 or (_target_enemy != null and not is_instance_valid(_target_enemy)):
+		_target_enemy = _find_nearest_enemy()
+		_target_search_timer = TARGET_SEARCH_INTERVAL
+
+	if is_instance_valid(_target_enemy):
+		var desired_dir = (_target_enemy.global_position - global_position).normalized()
 		var angle_diff = direction.angle_to(desired_dir)
 		var max_turn = turn_speed * delta
 		var clamped = clamp(angle_diff, -max_turn, max_turn)
@@ -46,12 +56,13 @@ func _physics_process(delta: float) -> void:
 func _find_nearest_enemy() -> Node2D:
 	var enemies = get_tree().get_nodes_in_group("Enemy")
 	var closest: Node2D = null
-	var closest_dist: float = 400.0
+	# Use squared distance for optimization
+	var closest_dist_sq: float = 160000.0 # 400.0 * 400.0
 	for enemy in enemies:
-		var dist = global_position.distance_to(enemy.global_position)
-		if dist < closest_dist:
+		var dist_sq = global_position.distance_squared_to(enemy.global_position)
+		if dist_sq < closest_dist_sq:
 			closest = enemy
-			closest_dist = dist
+			closest_dist_sq = dist_sq
 	return closest
 
 func _on_body_entered(body: Node2D) -> void:
@@ -66,12 +77,12 @@ func _on_body_entered(body: Node2D) -> void:
 
 func _volatile_explode(hit_body: Node2D) -> void:
 	var aoe_damage = damage * 0.4
-	var radius = 40.0
+	var radius_sq = 1600.0 # 40.0 * 40.0
 	var enemies = get_tree().get_nodes_in_group("Enemy")
 	for enemy in enemies:
 		if enemy == hit_body:
 			continue
-		if enemy.global_position.distance_to(global_position) <= radius:
+		if enemy.global_position.distance_squared_to(global_position) <= radius_sq:
 			if enemy.has_method("take_damage"):
 				enemy.take_damage(aoe_damage)
 	var particles = CPUParticles2D.new()
