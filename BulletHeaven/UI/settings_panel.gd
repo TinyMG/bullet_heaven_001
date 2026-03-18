@@ -81,6 +81,11 @@ func _load_settings() -> void:
 	file.close()
 	if err != OK:
 		return
+
+	# Security: Prevent crash from tampered/malformed JSON by validating type
+	if typeof(json.data) != TYPE_DICTIONARY:
+		return
+
 	var data: Dictionary = json.data
 	sfx_volume = data.get("sfx_volume", 1.0)
 	music_volume = data.get("music_volume", 1.0)
