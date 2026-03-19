@@ -1,0 +1,3 @@
+## 2024-05-24 - Avoid `get_nodes_in_group` array allocations and `distance_to` square root overhead
+**Learning:** In Godot `_physics_process` loops, `get_tree().get_nodes_in_group()` causes significant array allocations every frame, bottlenecking performance. Additionally, `global_position.distance_to()` invokes expensive square root operations unnecessarily when simply comparing distances.
+**Action:** Use `global_position.distance_squared_to()` for performance comparisons to avoid expensive square root calculations, especially in `_process` or `_physics_process` loops. When querying nodes, use caching mechanisms or throttle queries with timer intervals (e.g., 0.2s) instead of checking every frame.
