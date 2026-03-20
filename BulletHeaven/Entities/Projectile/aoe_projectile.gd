@@ -40,8 +40,10 @@ func _on_body_entered(body: Node2D) -> void:
 func _explode() -> void:
 	# Damage all enemies in radius
 	var enemies = get_tree().get_nodes_in_group("Enemy")
+	# Optimization: Use distance_squared_to to avoid expensive square root calculations
+	var explosion_radius_sq = explosion_radius * explosion_radius
 	for enemy in enemies:
-		if global_position.distance_to(enemy.global_position) <= explosion_radius:
+		if global_position.distance_squared_to(enemy.global_position) <= explosion_radius_sq:
 			if enemy.has_method("take_damage"):
 				enemy.take_damage(damage * 0.7)
 	# Visual explosion

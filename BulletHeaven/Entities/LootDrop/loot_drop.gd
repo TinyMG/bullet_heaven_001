@@ -61,7 +61,8 @@ func _physics_process(delta: float) -> void:
 		var dir = (target.global_position - global_position).normalized()
 		position += dir * magnet_speed * delta
 
-		if global_position.distance_to(target.global_position) < 15.0:
+		# Optimization: Use distance_squared_to to avoid expensive square root calculations
+		if global_position.distance_squared_to(target.global_position) < 225.0:
 			_collect()
 
 	# Bob up and down

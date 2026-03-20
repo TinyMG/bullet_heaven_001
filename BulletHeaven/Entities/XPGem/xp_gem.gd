@@ -33,7 +33,8 @@ func _physics_process(delta: float) -> void:
 		position += dir * magnet_speed * delta
 
 		# If close enough, collect
-		if global_position.distance_to(target.global_position) < 10.0:
+		# Optimization: Use distance_squared_to to avoid expensive square root calculations
+		if global_position.distance_squared_to(target.global_position) < 100.0:
 			_collect()
 
 func _on_area_entered(area: Area2D) -> void:

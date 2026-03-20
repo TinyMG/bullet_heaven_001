@@ -11,6 +11,11 @@ var turn_speed: float = 3.0
 var _lifetime_timer: float = 0.0
 var _ready_done: bool = false
 
+# Optimization: Cache nearest enemy to avoid per-frame get_nodes_in_group overhead
+var _cached_target: Node2D = null
+var _target_timer: float = 0.0
+const TARGET_REFRESH_RATE: float = 0.2
+
 func _ready() -> void:
 	if not _ready_done:
 		add_to_group("Projectile")
@@ -24,14 +29,20 @@ func activate() -> void:
 	visible = true
 	set_physics_process(true)
 	_lifetime_timer = lifetime
+	_cached_target = null
+	_target_timer = 0.0
 	set_deferred("monitoring", true)
 	set_deferred("monitorable", true)
 
 func _physics_process(delta: float) -> void:
-	# Home toward nearest enemy
-	var nearest = _find_nearest_enemy()
-	if nearest:
-		var desired_dir = (nearest.global_position - global_position).normalized()
+	# Home toward nearest enemy (cached to avoid per-frame get_nodes_in_group overhead)
+	_target_timer -= delta
+	if _target_timer <= 0.0 or not is_instance_valid(_cached_target):
+		_cached_target = _find_nearest_enemy()
+		_target_timer = TARGET_REFRESH_RATE
+
+	if is_instance_valid(_cached_target):
+		var desired_dir = (_cached_target.global_position - global_position).normalized()
 		var angle_diff = direction.angle_to(desired_dir)
 		var max_turn = turn_speed * delta
 		var clamped = clamp(angle_diff, -max_turn, max_turn)
@@ -46,12 +57,13 @@ func _physics_process(delta: float) -> void:
 func _find_nearest_enemy() -> Node2D:
 	var enemies = get_tree().get_nodes_in_group("Enemy")
 	var closest: Node2D = null
-	var closest_dist: float = 400.0
+	# Optimization: Use distance_squared_to to avoid expensive square root calculations
+	var closest_dist_sq: float = 160000.0 # 400 * 400
 	for enemy in enemies:
-		var dist = global_position.distance_to(enemy.global_position)
-		if dist < closest_dist:
+		var dist_sq = global_position.distance_squared_to(enemy.global_position)
+		if dist_sq < closest_dist_sq:
 			closest = enemy
-			closest_dist = dist
+			closest_dist_sq = dist_sq
 	return closest
 
 func _on_body_entered(body: Node2D) -> void:
@@ -66,12 +78,12 @@ func _on_body_entered(body: Node2D) -> void:
 
 func _volatile_explode(hit_body: Node2D) -> void:
 	var aoe_damage = damage * 0.4
-	var radius = 40.0
+	var radius_sq = 1600.0 # 40.0 * 40.0
 	var enemies = get_tree().get_nodes_in_group("Enemy")
 	for enemy in enemies:
 		if enemy == hit_body:
 			continue
-		if enemy.global_position.distance_to(global_position) <= radius:
+		if enemy.global_position.distance_squared_to(global_position) <= radius_sq:
 			if enemy.has_method("take_damage"):
 				enemy.take_damage(aoe_damage)
 	var particles = CPUParticles2D.new()
