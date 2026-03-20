@@ -1,0 +1,4 @@
+## $(date +%Y-%m-%d) - Prevent JSON Parsing Crashes from Malformed Save Files
+**Vulnerability:** Game crashes or throws script errors when a user modifies `user://save_data.json` or `user://settings.json` to contain an unexpected JSON type (e.g. Array or primitive) instead of a JSON Object (Dictionary), because `json.data` is blindly cast to a `Dictionary`.
+**Learning:** In Godot 4, `JSON.parse()` can return any valid JSON type in `json.data` (Array, Dictionary, String, float, etc). Blindly casting or accessing it as a Dictionary without type checking is a vulnerability that can be exploited by tampering with local save files.
+**Prevention:** Always strictly type-check parsed JSON data (e.g. `typeof(json.data) == TYPE_DICTIONARY`) before using or casting it, especially for user-accessible files.
