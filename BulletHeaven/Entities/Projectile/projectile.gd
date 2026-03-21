@@ -47,11 +47,13 @@ func _on_body_entered(body: Node2D) -> void:
 func _volatile_explode(hit_body: Node2D) -> void:
 	var aoe_damage = damage * 0.4
 	var radius = 40.0
+	# ⚡ Bolt Optimization: Precompute squared radius and use distance_squared_to
+	var radius_sq = radius * radius
 	var enemies = get_tree().get_nodes_in_group("Enemy")
 	for enemy in enemies:
 		if enemy == hit_body:
 			continue
-		if enemy.global_position.distance_to(global_position) <= radius:
+		if enemy.global_position.distance_squared_to(global_position) <= radius_sq:
 			if enemy.has_method("take_damage"):
 				enemy.take_damage(aoe_damage)
 	# Small visual burst
