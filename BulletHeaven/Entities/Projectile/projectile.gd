@@ -51,7 +51,7 @@ func _volatile_explode(hit_body: Node2D) -> void:
 	for enemy in enemies:
 		if enemy == hit_body:
 			continue
-		if enemy.global_position.distance_to(global_position) <= radius:
+		if enemy.global_position.distance_squared_to(global_position) <= radius * radius:
 			if enemy.has_method("take_damage"):
 				enemy.take_damage(aoe_damage)
 	# Small visual burst
