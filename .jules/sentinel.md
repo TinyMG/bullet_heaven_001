@@ -1,0 +1,4 @@
+## 2024-05-24 - Missing Type Check After JSON.parse
+**Vulnerability:** Parsing JSON from local files (`user://...`) via `JSON.parse()` without validating the parsed type (`json.data`).
+**Learning:** In Godot 4, `json.data` is dynamically typed based on the JSON content. If the file is tampered with (e.g., changed from an object `{}` to an array `[]`), casting it to `Dictionary` or accessing dictionary keys directly will cause a runtime crash.
+**Prevention:** Always check `typeof(json.data) == TYPE_DICTIONARY` (or the expected type) before variable assignment to prevent runtime crashes from malformed or maliciously tampered user files.
