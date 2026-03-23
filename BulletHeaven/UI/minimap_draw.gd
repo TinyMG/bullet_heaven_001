@@ -45,10 +45,10 @@ func _draw() -> void:
 		if not is_instance_valid(gem) or not gem.visible:
 			continue
 		var offset = gem.global_position - player_pos
-		if offset.length() > world_range:
+		if offset.length_squared() > world_range * world_range:
 			continue
 		var map_pos = center + offset * inv_range * draw_radius
-		if map_pos.distance_to(center) > clip_radius:
+		if map_pos.distance_squared_to(center) > clip_radius * clip_radius:
 			continue
 		draw_circle(map_pos, 1.0, Color(0.2, 0.9, 0.9, 0.5))
 
@@ -57,10 +57,10 @@ func _draw() -> void:
 		if not is_instance_valid(drop) or not drop.visible:
 			continue
 		var offset = drop.global_position - player_pos
-		if offset.length() > world_range:
+		if offset.length_squared() > world_range * world_range:
 			offset = offset.normalized() * world_range
 		var map_pos = center + offset * inv_range * draw_radius
-		if map_pos.distance_to(center) > clip_radius:
+		if map_pos.distance_squared_to(center) > clip_radius * clip_radius:
 			map_pos = center + (map_pos - center).normalized() * clip_radius
 		draw_circle(map_pos, 1.5, Color(0.3, 0.6, 1.0, 0.8))
 
@@ -69,10 +69,10 @@ func _draw() -> void:
 		if not is_instance_valid(enemy) or not enemy.visible:
 			continue
 		var offset = enemy.global_position - player_pos
-		if offset.length() > world_range:
+		if offset.length_squared() > world_range * world_range:
 			offset = offset.normalized() * world_range
 		var map_pos = center + offset * inv_range * draw_radius
-		if map_pos.distance_to(center) > clip_radius:
+		if map_pos.distance_squared_to(center) > clip_radius * clip_radius:
 			map_pos = center + (map_pos - center).normalized() * clip_radius
 
 		var dot_size = 2.0
