@@ -1,0 +1,4 @@
+## 2024-05-24 - [Insecure JSON Deserialization in Godot]
+**Vulnerability:** Godot applications parsing local JSON files (`user://save_data.json`, `user://settings.json`) without validating the parsed data type are vulnerable to runtime crashes if the data is malformed or tampered with.
+**Learning:** `JSON.parse` returns `OK` if the string is valid JSON, but `json.data` could be an array, string, number, or boolean instead of the expected Dictionary. Attempting to assign `json.data` directly to a `Dictionary` typed variable without a `typeof` check causes a crash.
+**Prevention:** Always validate the type of parsed JSON data using `typeof(json.data) == TYPE_DICTIONARY` before variable assignment.
