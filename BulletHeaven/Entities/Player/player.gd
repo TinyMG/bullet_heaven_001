@@ -27,6 +27,7 @@ var anim_delay: float = 0.1
 var anim_current: int = 0
 
 var shoot_anim_timer: float = 0.0
+var _last_target: Node2D = null
 
 enum AnimState {
 	IDLE, RUN, SHOOT, BOOST
@@ -92,11 +93,12 @@ func _physics_process(delta: float) -> void:
 	
 	# Determine state — BOOST takes priority over SHOOT so auto-fire doesn't flicker
 	shoot_anim_timer -= delta
-	if is_boosting and velocity.length() > 0.0:
+	# Optimize: use length_squared() instead of length() to avoid sqrt
+	if is_boosting and velocity.length_squared() > 0.0:
 		current_anim_state = AnimState.BOOST
 	elif shoot_anim_timer > 0.0:
 		current_anim_state = AnimState.SHOOT
-	elif velocity.length() > 0.0:
+	elif velocity.length_squared() > 0.0:
 		current_anim_state = AnimState.RUN
 	else:
 		current_anim_state = AnimState.IDLE
@@ -105,11 +107,10 @@ func _physics_process(delta: float) -> void:
 	if velocity.x != 0:
 		sprite.flip_h = velocity.x < 0
 	elif current_anim_state == AnimState.SHOOT:
-		var nearest = _find_nearest_enemy()
-		if nearest and nearest.global_position.x < global_position.x:
-			sprite.flip_h = true
-		elif nearest:
-			sprite.flip_h = false
+		# Optimize: avoid get_nodes_in_group and distance calculation every frame just for sprite flip
+		# Use the cached _last_target from actual firing instead
+		if is_instance_valid(_last_target):
+			sprite.flip_h = _last_target.global_position.x < global_position.x
 
 	# Get row, frame count, and speed for current state
 	var row: int = 0
@@ -180,12 +181,13 @@ func _on_fire_timer_timeout() -> void:
 func _find_nearest_enemy() -> Node2D:
 	var enemies = get_tree().get_nodes_in_group("Enemy")
 	var closest: Node2D = null
-	var closest_dist: float = 500.0  # Max targeting range
+	# Optimize: use distance_squared_to to avoid square root
+	var closest_dist_sq: float = 250000.0  # 500.0 * 500.0
 	for enemy in enemies:
-		var dist = global_position.distance_to(enemy.global_position)
-		if dist < closest_dist:
+		var dist_sq = global_position.distance_squared_to(enemy.global_position)
+		if dist_sq < closest_dist_sq:
 			closest = enemy
-			closest_dist = dist
+			closest_dist_sq = dist_sq
 	return closest
 
 func _get_weapon_type() -> String:
@@ -195,6 +197,7 @@ func _get_weapon_type() -> String:
 	return data.get("weapon_type", "standard")
 
 func _fire_at(target: Node2D) -> void:
+	_last_target = target
 	var weapon_type = _get_weapon_type()
 	match weapon_type:
 		"spread": _fire_spread(target)
