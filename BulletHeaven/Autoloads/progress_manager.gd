@@ -234,6 +234,12 @@ func load_game() -> void:
 		push_error("ProgressManager: Failed to parse save file.")
 		return
 
+	# Security context: Ensure parsed JSON is a Dictionary to prevent runtime crashes
+	# from maliciously modified or corrupted save files.
+	if typeof(json.data) != TYPE_DICTIONARY:
+		push_error("ProgressManager: Parsed save file data is not a valid dictionary.")
+		return
+
 	var data: Dictionary = json.data
 	if data.has("completed_nodes"):
 		completed_nodes = Array(data["completed_nodes"])
