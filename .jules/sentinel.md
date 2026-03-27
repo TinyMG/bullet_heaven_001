@@ -1,0 +1,4 @@
+## 2024-05-15 - [Type Safety in JSON Parsing]
+**Vulnerability:** In Godot 4, data parsed from local files (e.g., `user://save_data.json`, `user://settings.json`) via `JSON.parse()` was not type-checked before variable assignment.
+**Learning:** Assigning untyped parsed JSON data directly to typed variables (like `var data: Dictionary = json.data`) can cause a runtime crash if the user modifies the file to contain a different type (e.g., an Array or a primitive instead of an Object/Dictionary). This is a form of insecure deserialization where user input is implicitly trusted to conform to an expected schema.
+**Prevention:** Always strictly type-check parsed JSON data (e.g., `if typeof(json.data) == TYPE_DICTIONARY:`) before casting or assigning it to typed variables to prevent runtime crashes from tampered or malformed user files.
