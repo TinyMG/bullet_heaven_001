@@ -1,0 +1,4 @@
+## 2024-05-24 - Unvalidated JSON Root Type in Godot 4
+**Vulnerability:** Parsing `user://` local JSON files with `JSON.parse()` and directly assigning `json.data` to a strongly typed variable (e.g., `var data: Dictionary = json.data`) without verifying the underlying type.
+**Learning:** In Godot 4, `JSON.parse()` will return `OK` and set `json.data` to the parsed type even if the JSON root is an array, int, or string, instead of a dictionary. If a player or attacker tampers with the save/settings file to contain `[]` or `"string"`, the direct assignment to `Dictionary` will cause a runtime crash of the game client.
+**Prevention:** Always validate the root type of parsed JSON data using `typeof(json.data) == TYPE_DICTIONARY` (or appropriate type) before assigning it to a statically typed GDScript variable or accessing its elements.
