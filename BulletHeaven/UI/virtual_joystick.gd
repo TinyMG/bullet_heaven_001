@@ -61,16 +61,17 @@ func _move_base_to(screen_pos: Vector2) -> void:
 func _update_knob(screen_pos: Vector2) -> void:
 	var center = base.global_position + base.size * 0.5
 	var diff = screen_pos - center
-	var dist = diff.length()
+	var dist_sq = diff.length_squared()
+	var joystick_radius_sq = joystick_radius * joystick_radius
 
-	if dist > joystick_radius:
+	if dist_sq > joystick_radius_sq:
 		diff = diff.normalized() * joystick_radius
 
 	knob.global_position = center + diff - knob.size * 0.5
 
 	# Calculate output
 	output = diff / joystick_radius
-	if output.length() < dead_zone:
+	if output.length_squared() < (dead_zone * dead_zone):
 		output = Vector2.ZERO
 
 	_apply_input()

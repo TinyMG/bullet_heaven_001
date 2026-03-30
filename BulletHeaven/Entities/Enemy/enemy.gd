@@ -109,7 +109,7 @@ func _physics_process(delta: float) -> void:
 	
 	# Switch animation sheet based on movement
 	if _uses_multi_sheet:
-		if velocity.length() > 5.0:
+		if velocity.length_squared() > 25.0: # 5.0 squared
 			_set_anim("move")
 		else:
 			_set_anim("idle")
