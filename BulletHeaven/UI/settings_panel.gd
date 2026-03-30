@@ -81,6 +81,12 @@ func _load_settings() -> void:
 	file.close()
 	if err != OK:
 		return
+
+	# SECURITY: Verify JSON data is a Dictionary to prevent crash on malformed/tampered file
+	if typeof(json.data) != TYPE_DICTIONARY:
+		push_error("SettingsPanel: parsed JSON data is not a dictionary.")
+		return
+
 	var data: Dictionary = json.data
 	sfx_volume = data.get("sfx_volume", 1.0)
 	music_volume = data.get("music_volume", 1.0)
