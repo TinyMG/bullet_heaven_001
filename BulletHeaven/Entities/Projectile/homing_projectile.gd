@@ -10,6 +10,8 @@ var pierce_count: int = 0
 var turn_speed: float = 3.0
 var _lifetime_timer: float = 0.0
 var _ready_done: bool = false
+var _target: Node2D = null
+var _target_search_timer: float = 0.0
 
 func _ready() -> void:
 	if not _ready_done:
@@ -24,10 +26,13 @@ func activate() -> void:
 	visible = true
 	set_physics_process(true)
 	_lifetime_timer = lifetime
+	_target = null
+	_target_search_timer = 0.0
 	set_deferred("monitoring", true)
 	set_deferred("monitorable", true)
 
 func _physics_process(delta: float) -> void:
+	_target_search_timer -= delta
 	# Home toward nearest enemy
 	var nearest = _find_nearest_enemy()
 	if nearest:
@@ -44,15 +49,23 @@ func _physics_process(delta: float) -> void:
 		_release()
 
 func _find_nearest_enemy() -> Node2D:
-	var enemies = get_tree().get_nodes_in_group("Enemy")
-	var closest: Node2D = null
-	var closest_dist: float = 400.0
-	for enemy in enemies:
-		var dist = global_position.distance_to(enemy.global_position)
-		if dist < closest_dist:
-			closest = enemy
-			closest_dist = dist
-	return closest
+	if _target != null and not is_instance_valid(_target):
+		_target = null
+		_target_search_timer = 0.0 # Force immediate search if target died
+
+	if _target_search_timer <= 0.0:
+		_target_search_timer = 0.2
+		var enemies = get_tree().get_nodes_in_group("Enemy")
+		var closest: Node2D = null
+		var closest_dist_sq: float = 160000.0 # 400^2
+		for enemy in enemies:
+			var dist_sq = global_position.distance_squared_to(enemy.global_position)
+			if dist_sq < closest_dist_sq:
+				closest = enemy
+				closest_dist_sq = dist_sq
+		_target = closest
+
+	return _target
 
 func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("Enemy") and body.has_method("take_damage"):
@@ -66,12 +79,12 @@ func _on_body_entered(body: Node2D) -> void:
 
 func _volatile_explode(hit_body: Node2D) -> void:
 	var aoe_damage = damage * 0.4
-	var radius = 40.0
+	var radius_sq = 1600.0 # 40^2
 	var enemies = get_tree().get_nodes_in_group("Enemy")
 	for enemy in enemies:
 		if enemy == hit_body:
 			continue
-		if enemy.global_position.distance_to(global_position) <= radius:
+		if enemy.global_position.distance_squared_to(global_position) <= radius_sq:
 			if enemy.has_method("take_damage"):
 				enemy.take_damage(aoe_damage)
 	var particles = CPUParticles2D.new()
