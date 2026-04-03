@@ -56,6 +56,9 @@ var speed_modifier: float = 1.0
 # Cached stat values (updated on skill upgrade / equip change, not every frame)
 var _cached_hp_regen: float = 0.0
 
+var _target: Node2D = null
+var _target_timer: float = 0.0
+
 func _ready() -> void:
 	GameManager.player = self
 	add_to_group("Player")
@@ -90,6 +93,14 @@ func _physics_process(delta: float) -> void:
 	velocity = input_vector * speed * speed_modifier
 	move_and_slide()
 	
+	if _target != null and not is_instance_valid(_target):
+		_target = null
+
+	_target_timer -= delta
+	if _target_timer <= 0.0:
+		_target = _find_nearest_enemy()
+		_target_timer = 0.2
+
 	# Determine state — BOOST takes priority over SHOOT so auto-fire doesn't flicker
 	shoot_anim_timer -= delta
 	if is_boosting and velocity.length() > 0.0:
@@ -105,10 +116,9 @@ func _physics_process(delta: float) -> void:
 	if velocity.x != 0:
 		sprite.flip_h = velocity.x < 0
 	elif current_anim_state == AnimState.SHOOT:
-		var nearest = _find_nearest_enemy()
-		if nearest and nearest.global_position.x < global_position.x:
+		if _target and _target.global_position.x < global_position.x:
 			sprite.flip_h = true
-		elif nearest:
+		elif _target:
 			sprite.flip_h = false
 
 	# Get row, frame count, and speed for current state
@@ -172,20 +182,19 @@ func _get_anim_row(state: AnimState) -> int:
 	return 0
 
 func _on_fire_timer_timeout() -> void:
-	var nearest = _find_nearest_enemy()
-	if nearest == null:
+	if _target == null:
 		return
-	_fire_at(nearest)
+	_fire_at(_target)
 
 func _find_nearest_enemy() -> Node2D:
 	var enemies = get_tree().get_nodes_in_group("Enemy")
 	var closest: Node2D = null
-	var closest_dist: float = 500.0  # Max targeting range
+	var closest_dist_sq: float = 250000.0  # Max targeting range (500^2)
 	for enemy in enemies:
-		var dist = global_position.distance_to(enemy.global_position)
-		if dist < closest_dist:
+		var dist_sq = global_position.distance_squared_to(enemy.global_position)
+		if dist_sq < closest_dist_sq:
 			closest = enemy
-			closest_dist = dist
+			closest_dist_sq = dist_sq
 	return closest
 
 func _get_weapon_type() -> String:
