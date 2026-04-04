@@ -1,0 +1,3 @@
+## 2024-04-04 - Caching Target Lookups in Godot
+**Learning:** Calling `get_tree().get_nodes_in_group()` every frame in `_physics_process` for targeting logic is a major bottleneck due to array allocation, and using `distance_to()` invokes an expensive square root calculation.
+**Action:** Use a timer interval (e.g., 0.2s) to cache target queries and properly check for target validity using `_target != null and not is_instance_valid(_target)`. Always prefer `distance_squared_to()` over `distance_to()` in processing loops.
