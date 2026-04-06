@@ -1,0 +1,3 @@
+## 2025-04-06 - Homing Projectiles Frame-by-Frame Targeting Optimization
+**Learning:** For Godot performance optimizations, querying nodes with `get_tree().get_nodes_in_group()` every physics frame inside multiple projectiles is a massive bottleneck due to array allocation and loop iterations. Furthermore, calculating `distance_to()` involves expensive square root operations which compound the bottleneck.
+**Action:** Always implement a caching timer (e.g. 0.2s interval) when targeting enemies and check validity using `_target != null and not is_instance_valid(_target)`. Additionally, swap `distance_to()` with `distance_squared_to()` for comparative range checks.
