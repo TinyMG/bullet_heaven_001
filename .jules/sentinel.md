@@ -1,0 +1,4 @@
+## 2024-05-15 - Insecure JSON Deserialization Crash Prevention
+**Vulnerability:** In Godot 4, parsing local files like `user://save_data.json` or `user://settings.json` via `JSON.parse()` can result in crashes if tampered user files are not properly type-checked before casting to `Dictionary`.
+**Learning:** Godot's JSON parser returns a Variant type which might not be a Dictionary (e.g., an Array or primitive type). Directly accessing Dictionary methods on these types causes runtime type mismatch crashes.
+**Prevention:** Always explicitly check the type of `json.data` (e.g., `typeof(json.data) == TYPE_DICTIONARY`) before variable assignment or usage when dealing with locally sourced, potentially tampered JSON data.
