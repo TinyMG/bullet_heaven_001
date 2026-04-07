@@ -1,0 +1,4 @@
+## 2024-04-07 - Insecure JSON Deserialization in Godot 4
+**Vulnerability:** Missing type checking when parsing local JSON files (`user://save_data.json`, `user://settings.json`). Assigning `json.data` directly to a `Dictionary` typed variable can crash the game if the file is tampered with and contains an array or primitive instead of an object.
+**Learning:** In Godot 4, `JSON.parse()` returns an error for invalid syntax, but valid syntax could still be the wrong data type. We must explicitly verify `typeof(json.data) == TYPE_DICTIONARY` before assignment.
+**Prevention:** Always validate the structure and type of data returned from `JSON.parse()` when dealing with user-modifiable files.
