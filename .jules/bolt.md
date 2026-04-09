@@ -1,0 +1,3 @@
+## 2024-04-09 - Group Query and Distance Math Performance
+ **Learning:** Calling `get_tree().get_nodes_in_group("Enemy")` every frame in a `_physics_process` loop (like for homing projectiles) causes severe array allocation overhead. Also, using `distance_to` involves expensive square root calculations which bottleneck performance when checking multiple targets.
+ **Action:** Use a timer-based target caching system (e.g., updating every 0.2s) instead of querying nodes every frame. Check invalid targets using `_target != null and not is_instance_valid(_target)`. For all distance comparisons, use `distance_squared_to()` with pre-squared distances instead of `distance_to()`.
