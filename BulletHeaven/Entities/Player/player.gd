@@ -28,6 +28,9 @@ var anim_current: int = 0
 
 var shoot_anim_timer: float = 0.0
 
+var _cached_enemy: Node2D = null
+var _enemy_cache_timer: float = 0.0
+
 enum AnimState {
 	IDLE, RUN, SHOOT, BOOST
 }
@@ -105,7 +108,7 @@ func _physics_process(delta: float) -> void:
 	if velocity.x != 0:
 		sprite.flip_h = velocity.x < 0
 	elif current_anim_state == AnimState.SHOOT:
-		var nearest = _find_nearest_enemy()
+		var nearest = _get_cached_enemy()
 		if nearest and nearest.global_position.x < global_position.x:
 			sprite.flip_h = true
 		elif nearest:
@@ -172,20 +175,31 @@ func _get_anim_row(state: AnimState) -> int:
 	return 0
 
 func _on_fire_timer_timeout() -> void:
-	var nearest = _find_nearest_enemy()
+	var nearest = _get_cached_enemy()
 	if nearest == null:
 		return
 	_fire_at(nearest)
 
+func _process(delta: float) -> void:
+	_enemy_cache_timer -= delta
+	if _enemy_cache_timer <= 0.0 or (_cached_enemy != null and not is_instance_valid(_cached_enemy)):
+		_cached_enemy = _find_nearest_enemy()
+		_enemy_cache_timer = 0.2
+
+func _get_cached_enemy() -> Node2D:
+	if _cached_enemy and is_instance_valid(_cached_enemy):
+		return _cached_enemy
+	return null
+
 func _find_nearest_enemy() -> Node2D:
 	var enemies = get_tree().get_nodes_in_group("Enemy")
 	var closest: Node2D = null
-	var closest_dist: float = 500.0  # Max targeting range
+	var closest_dist_sq: float = 250000.0  # Max targeting range (500 * 500)
 	for enemy in enemies:
-		var dist = global_position.distance_to(enemy.global_position)
-		if dist < closest_dist:
+		var dist_sq = global_position.distance_squared_to(enemy.global_position)
+		if dist_sq < closest_dist_sq:
 			closest = enemy
-			closest_dist = dist
+			closest_dist_sq = dist_sq
 	return closest
 
 func _get_weapon_type() -> String:
