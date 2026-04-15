@@ -1,0 +1,3 @@
+## 2024-05-01 - Avoid distance_to() in Hot Paths
+**Learning:** Godot's `distance_to()` calculates a square root which is computationally expensive when queried repeatedly (e.g., nearest-neighbor iterations over all enemies or multiple objects in `_physics_process()`).
+**Action:** Substitute `distance_to()` with `distance_squared_to()` and pre-square the comparative threshold (e.g., `400.0` becomes `160000.0`) to avoid square root calculations in hot loops.
