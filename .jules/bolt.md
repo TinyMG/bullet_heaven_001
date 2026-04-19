@@ -1,0 +1,3 @@
+## 2024-04-19 - Avoid `get_nodes_in_group` every frame
+**Learning:** Calling `get_nodes_in_group` every frame (e.g. in `_physics_process`) allocates a new array each frame, causing severe performance bottlenecks and GC spikes in Godot. Calling `distance_to` in a loop over these nodes further exacerbates this with expensive sqrt calculations.
+**Action:** Cache the target using a `_target` variable and only call `get_nodes_in_group` on a timer (e.g. `0.2s`). Use `distance_squared_to` instead of `distance_to` for distance comparisons. When using a cached target, ensure to handle deleted nodes correctly with `_target != null and not is_instance_valid(_target)` to avoid continuous polling when no targets exist.
