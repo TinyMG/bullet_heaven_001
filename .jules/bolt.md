@@ -1,0 +1,3 @@
+## 2024-05-24 - Target Caching and Distance Squared in Godot
+**Learning:** Querying `get_tree().get_nodes_in_group("Enemy")` every frame in every homing projectile is a major performance bottleneck due to array allocation. Also, `distance_to` uses expensive square root calculations which can be avoided with `distance_squared_to`.
+**Action:** Implemented a timer (0.2s) to cache target nearest neighbors and replaced `distance_to` with `distance_squared_to` alongside squared thresholds in `homing_projectile.gd` to minimize physics frame time. Checked for `null` and `is_instance_valid` properly to prevent stale references.
