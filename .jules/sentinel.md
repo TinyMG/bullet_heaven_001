@@ -1,0 +1,4 @@
+## 2024-04-26 - Godot 4 JSON Deserialization Crash Risk
+**Vulnerability:** Parsing JSON directly into a typed variable like `var data: Dictionary = json.data` without type checking can cause a runtime crash if the user modifies the save or settings file to contain non-dictionary data (like an array or a string).
+**Learning:** In Godot 4, `JSON.new().parse()` succeeds if the JSON is valid, but doesn't guarantee the resulting `data` is the expected type. Assigning an unexpected type to a statically typed variable crashes the engine.
+**Prevention:** Always check the type of parsed data using `typeof(json.data) == TYPE_DICTIONARY` before casting or assigning it to a typed dictionary variable, especially for data from local user files (like save_data.json).
