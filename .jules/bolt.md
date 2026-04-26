@@ -1,0 +1,3 @@
+## 2024-05-24 - Target Caching & Squared Distances
+**Learning:** Querying `get_tree().get_nodes_in_group("Enemy")` every frame allocates a new array and creates a major bottleneck, especially for homing projectiles. Using `distance_to` adds expensive square root calculations.
+**Action:** Use a 0.2s timer to cache target lookups, use `distance_squared_to()`, and square the threshold limits for comparisons to significantly optimize performance.
