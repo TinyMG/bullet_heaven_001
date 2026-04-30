@@ -1,0 +1,3 @@
+## 2024-05-23 - Performance Optimization in Godot Game
+ **Learning:** In Godot performance optimizations, querying nodes with `get_tree().get_nodes_in_group()` every frame is a major bottleneck due to array allocation. Using `distance_squared_to()` is much more efficient than `distance_to()` which uses expensive square root calculations.
+ **Action:** Cache target queries with a short timer (e.g., 0.2s) instead of every frame, and use `distance_squared_to` with squared thresholds for distance comparisons. Ensure cached variables are reset properly in `activate()` functions for object pooled instances.
