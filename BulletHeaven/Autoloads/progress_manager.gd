@@ -230,8 +230,8 @@ func load_game() -> void:
 
 	var json = JSON.new()
 	var err = json.parse(json_text)
-	if err != OK:
-		push_error("ProgressManager: Failed to parse save file.")
+	if err != OK or typeof(json.data) != TYPE_DICTIONARY:
+		push_error("ProgressManager: Failed to parse save file or invalid root type.")
 		return
 
 	var data: Dictionary = json.data
