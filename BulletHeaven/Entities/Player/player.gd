@@ -92,11 +92,11 @@ func _physics_process(delta: float) -> void:
 	
 	# Determine state — BOOST takes priority over SHOOT so auto-fire doesn't flicker
 	shoot_anim_timer -= delta
-	if is_boosting and velocity.length() > 0.0:
+	if is_boosting and velocity.length_squared() > 0.0:
 		current_anim_state = AnimState.BOOST
 	elif shoot_anim_timer > 0.0:
 		current_anim_state = AnimState.SHOOT
-	elif velocity.length() > 0.0:
+	elif velocity.length_squared() > 0.0:
 		current_anim_state = AnimState.RUN
 	else:
 		current_anim_state = AnimState.IDLE
@@ -180,12 +180,12 @@ func _on_fire_timer_timeout() -> void:
 func _find_nearest_enemy() -> Node2D:
 	var enemies = get_tree().get_nodes_in_group("Enemy")
 	var closest: Node2D = null
-	var closest_dist: float = 500.0  # Max targeting range
+	var closest_dist_sq: float = 250000.0  # Max targeting range squared (500 * 500)
 	for enemy in enemies:
-		var dist = global_position.distance_to(enemy.global_position)
-		if dist < closest_dist:
+		var dist_sq = global_position.distance_squared_to(enemy.global_position)
+		if dist_sq < closest_dist_sq:
 			closest = enemy
-			closest_dist = dist
+			closest_dist_sq = dist_sq
 	return closest
 
 func _get_weapon_type() -> String:
