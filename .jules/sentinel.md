@@ -1,0 +1,4 @@
+## 2024-05-08 - Missing Type Validation on Deserialized User Data
+**Vulnerability:** User-provided files (save data and settings) were parsed using `JSON.new().parse()` and immediately cast to a `Dictionary` without type checking.
+**Learning:** In Godot 4, parsed JSON data can be of various types (Array, String, etc.). Casting to `Dictionary` without validating `typeof(json.data) == TYPE_DICTIONARY` can lead to runtime crashes if the file is tampered with or malformed.
+**Prevention:** Always perform a strict type check (`if typeof(json.data) != TYPE_DICTIONARY:`) before utilizing or assigning parsed JSON data from external/user files.
