@@ -10,6 +10,8 @@ var pierce_count: int = 0
 var turn_speed: float = 3.0
 var _lifetime_timer: float = 0.0
 var _ready_done: bool = false
+var _target: Node2D = null
+var _target_timer: float = 0.0
 
 func _ready() -> void:
 	if not _ready_done:
@@ -26,12 +28,18 @@ func activate() -> void:
 	_lifetime_timer = lifetime
 	set_deferred("monitoring", true)
 	set_deferred("monitorable", true)
+	_target = null
+	_target_timer = 0.0
 
 func _physics_process(delta: float) -> void:
 	# Home toward nearest enemy
-	var nearest = _find_nearest_enemy()
-	if nearest:
-		var desired_dir = (nearest.global_position - global_position).normalized()
+	_target_timer -= delta
+	if _target_timer <= 0.0 or (_target != null and not is_instance_valid(_target)):
+		_target = _find_nearest_enemy()
+		_target_timer = 0.2
+
+	if _target and is_instance_valid(_target):
+		var desired_dir = (_target.global_position - global_position).normalized()
 		var angle_diff = direction.angle_to(desired_dir)
 		var max_turn = turn_speed * delta
 		var clamped = clamp(angle_diff, -max_turn, max_turn)
@@ -44,14 +52,15 @@ func _physics_process(delta: float) -> void:
 		_release()
 
 func _find_nearest_enemy() -> Node2D:
+	# Optimized: distance_squared_to avoids sqrt calculation
 	var enemies = get_tree().get_nodes_in_group("Enemy")
 	var closest: Node2D = null
-	var closest_dist: float = 400.0
+	var closest_dist_sq: float = 160000.0 # 400.0 * 400.0
 	for enemy in enemies:
-		var dist = global_position.distance_to(enemy.global_position)
-		if dist < closest_dist:
+		var dist_sq = global_position.distance_squared_to(enemy.global_position)
+		if dist_sq < closest_dist_sq:
 			closest = enemy
-			closest_dist = dist
+			closest_dist_sq = dist_sq
 	return closest
 
 func _on_body_entered(body: Node2D) -> void:

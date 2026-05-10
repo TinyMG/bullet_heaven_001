@@ -1,0 +1,3 @@
+## 2024-05-15 - Caching expensive get_nodes_in_group and distance_to
+**Learning:** Calling `get_tree().get_nodes_in_group("Enemy")` every frame in the `_physics_process` of projectiles causes significant array allocation overhead. In combination with `distance_to`, which requires expensive square root calculations, this becomes a major bottleneck for homing projectiles.
+**Action:** Replace `distance_to` with `distance_squared_to` when comparing against constants, and cache targets over a timer interval (e.g. 0.2s) instead of re-evaluating the nearest enemy every frame.
