@@ -79,7 +79,7 @@ func _load_settings() -> void:
 	var json = JSON.new()
 	var err = json.parse(file.get_as_text())
 	file.close()
-	if err != OK:
+	if err != OK or typeof(json.data) != TYPE_DICTIONARY:
 		return
 	var data: Dictionary = json.data
 	sfx_volume = data.get("sfx_volume", 1.0)
